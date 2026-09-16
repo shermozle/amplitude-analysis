@@ -1,0 +1,617 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 3 Talk Track</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300..600&display=swap">
+
+<style>
+:root {
+  --ground:  #FFFFFF;
+  --panel:   #F4F6FA;
+  --panel-2: #EAEEF6;
+  --line:    #DCE2EC;
+  --line-hi: #BEC7D6;
+  --text:    #131820;
+  --dim:     #4C5766;
+  --faint:   #7B8695;
+  --accent:  #2C5BD8;
+  --signal:  #0E7C63;
+  --warn:    #A8541A;
+  --warn-bg: #FDF3E9;
+  --sig-bg:  #E8F6F2;
+
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --disp: "Archivo", var(--sans);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:  #0B0E14;
+    --panel:   #141A25;
+    --panel-2: #1B2331;
+    --line:    #262F3D;
+    --line-hi: #3A4658;
+    --text:    #EDF1F7;
+    --dim:     #A3AEBF;
+    --faint:   #6F7B8C;
+    --accent:  #7FA6FF;
+    --signal:  #3FDCB2;
+    --warn:    #FFB067;
+    --warn-bg: #241A0E;
+    --sig-bg:  #0D2B25;
+  }
+}
+:root[data-theme="dark"] {
+  --ground:  #0B0E14;
+  --panel:   #141A25;
+  --panel-2: #1B2331;
+  --line:    #262F3D;
+  --line-hi: #3A4658;
+  --text:    #EDF1F7;
+  --dim:     #A3AEBF;
+  --faint:   #6F7B8C;
+  --accent:  #7FA6FF;
+  --signal:  #3FDCB2;
+  --warn:    #FFB067;
+  --warn-bg: #241A0E;
+  --sig-bg:  #0D2B25;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 0 24px 96px;
+  background: var(--ground); color: var(--text);
+  font-family: var(--sans); font-weight: 300;
+  font-size: 16.5px; line-height: 1.6;
+}
+.wrap { max-width: 820px; margin: 0 auto; }
+
+header.top { padding: 52px 0 30px; border-bottom: 2px solid var(--line-hi); }
+header.top h1 {
+  font-family: var(--disp); font-variation-settings: "wdth" 108, "wght" 800;
+  font-size: 40px; line-height: 1.06; letter-spacing: -.028em; margin: 0 0 10px;
+}
+header.top .sub { color: var(--dim); font-size: 18px; margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.meta span {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .05em;
+  border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; color: var(--dim);
+}
+
+h2.sec {
+  font-family: var(--disp); font-variation-settings: "wdth" 104, "wght" 750;
+  font-size: 27px; letter-spacing: -.02em; margin: 52px 0 4px; padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+.budget, .subhead {
+  font-family: var(--mono); font-size: 12.5px; color: var(--signal);
+  letter-spacing: .06em; text-transform: uppercase; margin: 0 0 18px;
+}
+/* .budget is reserved for the five run-of-show sections — check_pack.py sums
+   the minutes it finds there against the session length. Appendix headings use
+   .subhead so their timings don't get counted into the total. */
+
+/* ---------- slide blocks ---------- */
+
+.slide-block { margin: 0 0 26px; padding: 18px 0 0; border-top: 1px solid var(--line); }
+.slide-block:first-of-type { border-top: 0; }
+.bhead { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.sn {
+  font-family: var(--mono); font-size: 12.5px; font-weight: 600;
+  background: var(--panel-2); border: 1px solid var(--line);
+  border-radius: 6px; padding: 3px 9px; color: var(--dim); flex: none;
+}
+.clock {
+  font-family: var(--mono); font-size: 12.5px; color: var(--signal);
+  font-variant-numeric: tabular-nums; flex: none;
+}
+.btitle {
+  font-family: var(--disp); font-variation-settings: "wdth" 100, "wght" 700;
+  font-size: 19px; letter-spacing: -.012em;
+}
+.slide-block p { margin: 0 0 11px; }
+.slide-block p:last-child { margin-bottom: 0; }
+.slide-block strong { font-weight: 600; color: var(--text); }
+.slide-block em { font-style: italic; }
+code {
+  font-family: var(--mono); font-size: .89em;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 4px; padding: 1px 5px; color: var(--accent);
+}
+
+.say { border-left: 3px solid var(--line-hi); padding-left: 16px; margin: 0 0 12px; }
+.say p:last-child { margin-bottom: 0; }
+
+.do {
+  background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 12px 0;
+  font-size: 15.5px; color: var(--dim);
+}
+.do .lbl, .cut .lbl, .note .lbl {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .13em;
+  text-transform: uppercase; display: block; margin-bottom: 5px;
+}
+.do .lbl { color: var(--accent); }
+.do p, .cut p, .note p { margin: 0 0 8px; }
+.do p:last-child, .cut p:last-child, .note p:last-child { margin-bottom: 0; }
+
+.cut {
+  background: var(--warn-bg); border: 1px solid var(--line); border-left: 3px solid var(--warn);
+  border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 12px 0;
+  font-size: 15.5px; color: var(--dim);
+}
+.cut .lbl { color: var(--warn); }
+
+.note {
+  background: var(--sig-bg); border: 1px solid var(--line); border-left: 3px solid var(--signal);
+  border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 12px 0;
+  font-size: 15.5px; color: var(--dim);
+}
+.note .lbl { color: var(--signal); }
+
+ul, ol { margin: 0 0 12px; padding-left: 22px; }
+li { margin-bottom: 6px; }
+
+table.q { width: 100%; border-collapse: collapse; margin: 16px 0 24px; }
+table.q th {
+  text-align: left; font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--faint); font-weight: 400;
+  padding: 0 14px 8px 0; border-bottom: 1px solid var(--line-hi);
+}
+table.q td {
+  padding: 11px 14px 11px 0; border-bottom: 1px solid var(--line);
+  font-size: 15.5px; line-height: 1.5; vertical-align: top; color: var(--dim);
+}
+table.q td.qq { color: var(--text); font-weight: 500; width: 38%; }
+
+table.ros { width: 100%; border-collapse: collapse; margin: 18px 0 8px; }
+table.ros th {
+  text-align: left; font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--faint); font-weight: 400;
+  padding: 0 14px 8px 0; border-bottom: 1px solid var(--line-hi);
+}
+table.ros td {
+  padding: 9px 14px 9px 0; border-bottom: 1px solid var(--line);
+  font-size: 15.5px; line-height: 1.45; vertical-align: top; color: var(--dim);
+}
+table.ros td.mins { font-family: var(--mono); font-size: 13px; color: var(--signal); white-space: nowrap; }
+table.ros td.nm { color: var(--text); font-weight: 500; white-space: nowrap; }
+
+.check { list-style: none; padding-left: 0; }
+.check li { position: relative; padding-left: 30px; margin-bottom: 9px; }
+.check li::before {
+  content: "☐"; position: absolute; left: 4px; top: 0;
+  font-size: 16px; color: var(--faint);
+}
+
+a { color: var(--accent); }
+.urlbar {
+  font-family: var(--mono); font-size: 14px; background: var(--panel);
+  border: 1px solid var(--line); border-radius: 8px; padding: 11px 14px;
+  margin: 12px 0; overflow-wrap: anywhere;
+}
+
+@media print {
+  body { font-size: 11pt; padding: 0; }
+  .slide-block { page-break-inside: avoid; }
+  h2.sec { page-break-after: avoid; }
+}
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <h1>Session 3 — talk track</h1>
+  <p class="sub">Telstra implementers · analysis and debugging · 60 minutes, hands-on</p>
+  <div class="meta">
+    <span>22 slides</span><span>60 min</span><span>Sandbox: steep-bush-453227</span><span>Site: telstra-demo</span><span>Presenter: Simon</span>
+  </div>
+</header>
+
+<div class="note" style="margin-top:26px">
+  <span class="lbl">How to use this</span>
+  <p>A floor, not a script. The prose is here so you don't lose the thread while eight people are asking why their chart is empty. Use your own words.</p>
+  <p>The hour is over-subscribed on purpose, because the room will talk. Blocks 15 and 16 are marked <strong>cut first</strong> and block 12 <strong>cut second</strong>. Shed those rather than eating into block 18, which is the one thing here that only works with these people in the room.</p>
+</div>
+
+<h3 style="font-family:var(--disp);font-variation-settings:'wdth' 104,'wght' 750;font-size:20px;margin:36px 0 0">Run of show</h3>
+<table class="ros">
+  <thead><tr><th>Mins</th><th>Section</th><th>Slides</th><th>What happens</th></tr></thead>
+  <tbody>
+    <tr><td class="mins">0–5</td><td class="nm">Frame</td><td>1–4</td><td>Get everyone logged in. Establish the two-sources framing.</td></tr>
+    <tr><td class="mins">5–15</td><td class="nm">The toolkit</td><td>5–9</td><td>They generate their own data, then follow it through three debugging tools.</td></tr>
+    <tr><td class="mins">15–37</td><td class="nm">Four charts</td><td>10–16</td><td>Build-along. You drive on screen, they follow on their own laptops.</td></tr>
+    <tr><td class="mins">37–52</td><td class="nm">Your chart</td><td>17–19</td><td>Protected. Each person answers a question they answer in Adobe today.</td></tr>
+    <tr><td class="mins">52–60</td><td class="nm">Close</td><td>20–22</td><td>Three or four share-backs, homework, what session 4 covers.</td></tr>
+  </tbody>
+</table>
+<p style="color:var(--faint);font-size:15px;margin:0">The debugging tools come first rather than last. It puts something concrete in the first ten minutes, it means the charts get built on data the room just made, and it surfaces broken logins at minute six instead of minute fifty.</p>
+
+<!-- ═══════════════ ACT 0 ═══════════════ -->
+
+<h2 class="sec">Frame</h2>
+<p class="budget">Slides 1–4 · 5 minutes · ends at 5:00</p>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">1</span><span class="clock">0:00</span><span class="btitle">Cover</span></div>
+  <div class="say">
+    <p>Right, laptops open. Today you do the work and I get out of the way, mostly.</p>
+    <p>Two halves. First I'll show you the tools you use when you don't trust a number, because you're going to need them within about ten minutes. Then four chart types. Then the last twenty minutes are yours: you each pick a question you currently answer in Adobe, and you build it.</p>
+  </div>
+  <div class="do">
+    <span class="lbl">Do</span>
+    <p>Don't linger here. Every second on the cover is a second not spent finding out that someone's login doesn't work.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">2</span><span class="clock">1:00</span><span class="btitle">Where we are</span></div>
+  <div class="say">
+    <p>Session one was the model, session two was events and properties. Today is analysis, which is where those two start paying for themselves.</p>
+    <p>Fair warning about the title: a decent chunk of today is about how charts mislead you. Reading one sceptically is the skill I'm trying to teach, and the data in this sandbox has several real problems in it, deliberately, so you'll get the practice.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">3</span><span class="clock">2:00</span><span class="btitle">What you need open</span></div>
+  <div class="say">
+    <p>Two tabs. The sandbox, and the demo site. Get both open now and tell me if either fails.</p>
+    <p>One warning about the site. There's a demo panel behind the gear button, bottom right, and it has an API key field in it. If you paste anything in there your events go to a project I can't see and you'll spend the hour wondering why your charts are empty. Leave it alone.</p>
+  </div>
+  <div class="do">
+    <span class="lbl">Do</span>
+    <p>Wait for actual confirmation from every person. Ask by name if you have to. This is the cheapest thirty seconds in the hour.</p>
+    <p>If someone's login is broken, pair them with a neighbour immediately rather than trying to fix it. You can sort it out afterwards.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">4</span><span class="clock">3:30</span><span class="btitle">One project, two sources</span></div>
+  <div class="say">
+    <p>Before anything else, this. One project, two sources of data.</p>
+    <p>There's about a month of generated history, so that charts have something in them before any of us touches anything. And there's the live site, which is running the browser SDK with autocapture and Session Replay on. Anything you click in the next hour lands in the same project within a few seconds.</p>
+    <p>The important bit: the two sources use the same event and property <em>names</em>, but not the same <em>contents</em>. Nineteen events have history behind them. The other twenty-one are live only, so they'll look completely empty until someone uses the site.</p>
+    <p>Almost every strange number you meet today comes back to that. If you leave with one habit, let it be asking which sources feed a chart before you assume the chart is broken.</p>
+  </div>
+  <div class="note">
+    <span class="lbl">Worth saying out loud</span>
+    <p>This audience has spent years reconciling report suites, so the idea of two data sources meeting in one place with different semantics is entirely familiar to them. Lean on that rather than explaining it as if it were novel.</p>
+  </div>
+</div>
+
+<!-- ═══════════════ ACT 1 ═══════════════ -->
+
+<h2 class="sec">The toolkit</h2>
+<p class="budget">Slides 5–9 · 10 minutes · ends at 15:00</p>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">5</span><span class="clock">5:00</span><span class="btitle">Act 1 divider</span></div>
+  <div class="say">
+    <p>We're starting with the debugging tools, which is back to front for a training session. The reason is that I want the charts you build later to be reading data you made yourself, and I want you to have seen it arrive.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">6</span><span class="clock">5:15</span><span class="btitle">Exercise · make some data</span></div>
+  <div class="say">
+    <p>Three minutes. Buy a phone.</p>
+    <p>One instruction that matters: <strong>stay logged out</strong>. While you're anonymous your device ID is yours alone, which makes you findable in a minute. I'll explain why that's worth caring about shortly.</p>
+    <p>Pick a mobile on a plan, choose a colour and a storage size, pick a plan, add it to the cart. In the cart, apply the promo code <code>ONLINE50</code>. Then check out: four steps, put whatever you like in the form fields.</p>
+  </div>
+  <div class="do">
+    <span class="lbl">Do</span>
+    <p>Do it yourself on the shared screen at the same time, slightly ahead, so anyone lost can follow along by watching.</p>
+    <p>Then ask the room to name three events they think they just sent. You'll get <code>Add to Cart</code> and something purchase-shaped. Nobody will guess the colour and storage selections, and that's the useful part: a well-instrumented configurator sends a lot more than people expect.</p>
+  </div>
+  <div class="note">
+    <span class="lbl">Keep an eye on</span>
+    <p>If someone's events aren't appearing at all later, the first thing to check is the Guides &amp; Surveys toggle in their demo panel. It's wired to the SDK's opt-out flag, so switching it off stops everything, silently, including replay. It's a genuine mislabelling. Show it on purpose if you have a spare minute.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">7</span><span class="clock">8:30</span><span class="btitle">What left the browser</span></div>
+  <div class="say">
+    <p>Tool one. Event Explorer is a Chrome extension that sits in the page and lists every event as it's sent, with the full property payload, plus your device ID and session ID. If you've used the Experience Platform debugger or watched a packet monitor, this is that job.</p>
+    <p>If you haven't got the extension, the site has its own log: gear button, bottom right, or Ctrl+Shift+D. It records every tracking call the site makes. That's a good pattern to steal for their own build, because it costs about ten lines and saves hours.</p>
+    <p>Find your <code>Order Placed</code> and open up the <code>Products</code> property. One object per line item: brand, department, price, quantity, and a discount flag. That array is what makes the cart breakdowns in the next section possible, and it's the thing we spent most of session two on.</p>
+  </div>
+  <div class="do">
+    <span class="lbl">Do</span>
+    <p>Show the payload on screen rather than describing it. Point at <code>discount_applied</code> being <code>Yes</code> and ask why. The promo code is the answer, and it plants the flag for the typo you'll hit in block 12.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">8</span><span class="clock">11:00</span><span class="btitle">What Amplitude accepted</span></div>
+  <div class="say">
+    <p>Tool two, and this one's inside Amplitude, under Data. The Ingestion Debugger is a live view of events arriving at the server, with the payload as received.</p>
+    <p>Why that's a separate tool from the last one: the extension tells you what left the browser. This tells you what Amplitude kept. Those are different questions, and the gap between them is where a specific and very annoying class of bug lives. Instrumentation that looks perfect in the browser and produces nothing in a chart is almost always a filter, a block, or a type mismatch, and this is the only place it shows.</p>
+  </div>
+  <div class="do">
+    <span class="lbl">Do</span>
+    <p>Ask the question on the slide and actually wait: if the extension shows the event and this doesn't, where do you look? Somebody will say the SDK key. Somebody will say a filter. Both are good answers and the discussion is worth more than my telling them.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">9</span><span class="clock">12:30</span><span class="btitle">One user's actual events</span></div>
+  <div class="say">
+    <p>Tool three, and it's the one you'll use most often for the rest of your career here. User Lookup gives you one person's events in order, with every property, and every user-property change marked at the point it happened.</p>
+    <p>It's what you open when someone says the report is wrong. You stop arguing about the aggregate and go and look at one person's actual events.</p>
+    <p>Now do this. Search for user ID <code>2003964661</code>. Then log in on the site, as anybody, any email, and look again.</p>
+    <p>Everyone who logs in becomes that ID, because the site hardcodes one customer number. Eight people's sessions, one user profile, no error, no warning, and a chart of "purchases per user" that is quietly nonsense. That's not a contrived example. It's the shape of a real bug, and it's the opening case in session four.</p>
+  </div>
+  <div class="note">
+    <span class="lbl">Don't oversell it</span>
+    <p>State it as a property of this demo site rather than a cautionary tale about anyone. It lands better, and it's true: this is a demo app someone wrote quickly, which is exactly how the real version of this bug gets written too.</p>
+  </div>
+  <div class="cut">
+    <span class="lbl">Optional, 60 seconds</span>
+    <p>If you're ahead of the clock, find your own session in Session Replay from the user profile and play ten seconds of it. Watching your own checkout back is the thing people remember from the session. Confirm before the day that replay is actually ingesting in this project.</p>
+  </div>
+</div>
+
+<!-- ═══════════════ ACT 2 ═══════════════ -->
+
+<h2 class="sec">Four charts</h2>
+<p class="budget">Slides 10–16 · 22 minutes · ends at 37:00</p>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">10</span><span class="clock">15:00</span><span class="btitle">Act 2 divider</span></div>
+  <div class="say">
+    <p>Four chart types. I'll build each one on the screen and you follow along. Shout if I'm going too fast, because I will be.</p>
+  </div>
+  <div class="do">
+    <span class="lbl">Do</span>
+    <p>Say the words "follow along on your own laptop" explicitly. Without it, half the room watches, and then block 18 starts from zero for them.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">11</span><span class="clock">15:15</span><span class="btitle">The four, and what they answer</span></div>
+  <div class="say">
+    <p>Four questions, four chart types. How many broken down by what; where people fall out; what they did next; how often and for how long.</p>
+    <p>The third column is the route you'd take in Adobe for the same question, roughly. The fourth is where it actually differs, and those differences are worth knowing before you promise anyone parity.</p>
+    <p>One adjustment I'd flag now. Amplitude asks you to choose the question type before it gives you a canvas, which after years of starting from a blank freeform table feels like a constraint. Mostly it isn't: because the chart knows what you're asking, the controls in front of you are the ones that question needs. But it does mean the first move is deciding what kind of question you have.</p>
+  </div>
+  <div class="note">
+    <span class="lbl">Expect pushback here</span>
+    <p>Somebody will ask where the freeform table went. Data Table is the honest answer, and it's genuinely not a like-for-like replacement. Say that plainly rather than defending it, and note the specific thing they'd lose so it can go on the list for session 5.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">12</span><span class="clock">17:30</span><span class="btitle">When a number looks wrong</span></div>
+  <div class="say">
+    <p>Four things in this data that will make you think something's broken. I'm giving you them up front so that when you hit one, you recognise it instead of losing five minutes.</p>
+    <p>One. There's a property spelled <code>dicount_applied</code>, missing an S. The generator spells it that way and the site spells it correctly, so the tracking plan shows two children under the same parent, each populated for about half the data. Group by either one and you've silently reported on half your cohort. Nothing errors.</p>
+    <p>Two. Group cart events by brand over thirty days and you'll see Fossil and Michael Kors sitting next to iPhones. The generated line items carry a fashion catalogue that can't be configured out. Scope the same chart to today and it resolves. That's two sources agreeing on a schema and disagreeing on contents, which looks exactly like a data quality incident.</p>
+    <p>Three. Autocapture sends its own page view event, and the site also sends a custom one with more properties. Two near-identical names next to each other in the picker. Neither is wrong, and someone in a hurry will pick the wrong one.</p>
+    <p>Four. Twenty-one events have no history at all. You'll hit that in about five minutes.</p>
+    <p>So: when a number surprises you, first question is which sources feed it, second is which of those four it is.</p>
+  </div>
+  <div class="cut">
+    <span class="lbl">Cut second</span>
+    <p>If you're behind, cover the typo and the live-only events and skip the other two, then leave the slide up while they work. The typo is the one with the most transferable lesson, and the brands one explains itself the moment somebody hits it.</p>
+  </div>
+  <div class="do">
+    <span class="lbl">Do</span>
+    <p>On the typo, ask what they'd do about it two weeks after launch with a month of data behind it. Renaming in Data changes the display name going forward and doesn't rewrite what's ingested; a transformation can map old onto new; or you fix the emitter and document the seam. All three are defensible. It's a good two-minute argument and this room will have opinions.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">13</span><span class="clock">20:00</span><span class="btitle">Exercise · Data Table</span></div>
+  <div class="say">
+    <p>Data Table first, because it's where you'll spend most of your time. New chart, Data Table. Rows: add to cart, checkout started, order placed.</p>
+    <p>Add a second metric so you've got uniques and totals side by side, and look at where they diverge. That gap is people doing the same thing more than once, and in a cart it's usually interesting.</p>
+    <p>Then break down by <code>Products.department</code>. Mobile, Internet, Accessories. This is the part that needed the array: you're grouping by something inside the cart rather than something about the cart as a whole.</p>
+    <p>Last, add a segment for Gold and VIP tier members.</p>
+  </div>
+  <div class="do">
+    <span class="lbl">Do</span>
+    <p>Ask the question on the slide: what would you build in a freeform table that you can't see a way to build here? Write the answers down. This is the first real input into the requirements list and it's better coming from them than from me.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">14</span><span class="clock">25:00</span><span class="btitle">Exercise · Funnel</span></div>
+  <div class="say">
+    <p>Funnel. Product viewed, add to cart, checkout started, order placed.</p>
+    <p>First thing to play with: the conversion window. Move it from one day to thirty and watch the rate change. Same data, different question, and it's an explicit control rather than a property of how the report was built. That's one of the places your numbers will not line up with Adobe, and it's better to know why now than to discover it in a reconciliation meeting.</p>
+    <p>Group by department. Then insert checkout step completed as step four and watch the whole funnel fall over.</p>
+    <p>That event is live only. It has no generated history, so a funnel containing it reports only on people who have every single step, which right now is the handful of us in this room. A funnel silently narrows to whoever qualifies, and it doesn't tell you it's done it.</p>
+  </div>
+  <div class="do">
+    <span class="lbl">Do</span>
+    <p>Let them discover the collapse rather than announcing it. Wait for someone to say "mine's broken", then take the explanation from there.</p>
+    <p>Then ask where this bites while two tools are running side by side and half the events are live in one and half in the other. They know the answer better than you do.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">15</span><span class="clock">30:30</span><span class="btitle">Exercise · Journeys</span></div>
+  <div class="say">
+    <p>Journeys, quickly. New chart, Journeys, start from address checked, then filter it to the cases where serviceability failed.</p>
+    <p>Read the branches. Where do people go when the answer is no? Support, another address, or away.</p>
+    <p>The thing worth noticing is the starting point. A flow report anchored on page URLs can't ask this question, because "the address failed" isn't a page, it's a property value on an event. Starting a path from an event with a filter on it is the difference.</p>
+  </div>
+  <div class="cut">
+    <span class="lbl">Cut first</span>
+    <p>If you're past 32 minutes, stop running this as an exercise and just build it on the screen in ninety seconds while they watch. The lesson survives being demonstrated; block 18 does not survive being shortened.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">16</span><span class="clock">33:30</span><span class="btitle">Exercise · User Sessions</span></div>
+  <div class="say">
+    <p>Last one, and it's quick. User Sessions: sessions per user, average session length. Add a second series segmented to people who placed an order, and compare.</p>
+    <p>One definitional thing. A session here is a gap of inactivity, set once as a project setting. It isn't a hit-based visit. So sessions and visits are close cousins rather than the same measure, and if you're reconciling the two tools, that's another line in the "expected to differ" column.</p>
+  </div>
+  <div class="cut">
+    <span class="lbl">Cut first</span>
+    <p>Same as block 15. Demo it in a minute, or skip it entirely and mention that it exists. Of the four, this is the one they'll need least in week one.</p>
+  </div>
+</div>
+
+<!-- ═══════════════ ACT 3 ═══════════════ -->
+
+<h2 class="sec">Your chart</h2>
+<p class="budget">Slides 17–19 · 15 minutes · ends at 52:00</p>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">17</span><span class="clock">37:00</span><span class="btitle">Act 3 divider</span></div>
+  <div class="say">
+    <p>Right. Fifteen minutes, and it's yours.</p>
+  </div>
+  <div class="do">
+    <span class="lbl">Do</span>
+    <p>Protect this block. If the clock says 40 when you get here, you've overrun two sections and you should still give them the full fifteen. Everything before this was setup for it.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">18</span><span class="clock">37:15</span><span class="btitle">Exercise · your chart</span></div>
+  <div class="say">
+    <p>One question each, one chart each.</p>
+    <p>Before you touch Amplitude, write the question down in one sentence. Something you actually get asked in Adobe. Two minutes on that, and do it properly, because a vague question produces a vague chart and you'll spend ten minutes discovering that.</p>
+    <p>Then build it. Any of the four types, and any of this data.</p>
+    <p>And if it can't be answered with what's here, that's a result, not a failure. Write down what's missing: which event, which property, on which step. I want that list more than I want your chart.</p>
+  </div>
+  <div class="do">
+    <span class="lbl">Do</span>
+    <p>Circulate. Don't sit at the front. Two minutes each, and resist building it for them: ask what they've tried and what the chart is currently telling them.</p>
+    <p>Keep your own note of the gaps as you hear them. You'll want them in the share-back and afterwards for the requirements session.</p>
+    <p>At 47 minutes, call out "five minutes, start writing down where you got to". People need the warning or the share-back starts with nobody ready.</p>
+  </div>
+  <div class="note">
+    <span class="lbl">If the room stalls</span>
+    <p>If two or three people can't think of a question, don't let it drag. Put up slide 19 and tell them to take one from the list. A stalled exercise empties the room's energy faster than anything else in the hour.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">19</span><span class="clock">40:00</span><span class="btitle">If you're stuck</span></div>
+  <div class="say">
+    <p>Seven that definitely work in this data, if your own question isn't coming.</p>
+  </div>
+  <div class="do">
+    <span class="lbl">Do</span>
+    <p>Don't present this slide. Put it up around minute 40 and leave it there for the rest of the block as a reference. Talking through seven questions would eat four minutes of their build time.</p>
+  </div>
+</div>
+
+<!-- ═══════════════ ACT 4 ═══════════════ -->
+
+<h2 class="sec">Close</h2>
+<p class="budget">Slides 20–22 · 8 minutes · ends at 60:00</p>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">20</span><span class="clock">52:00</span><span class="btitle">Share-back</span></div>
+  <div class="say">
+    <p>Three or four of you, share your screen, thirty seconds each. What did you ask, and did it work?</p>
+    <p>I'm sorting the answers into three columns. Straight across, where the question mapped onto a chart type with no argument. Needed a property, where it's answerable in principle but something isn't being sent. And needed something else, where it's a chart type we haven't covered or a genuine modelling problem.</p>
+    <p>Columns two and three are the useful output of the hour. Those become the tracking plan requirements and the agenda for the next two sessions, and I can't write them without you.</p>
+  </div>
+  <div class="do">
+    <span class="lbl">Do</span>
+    <p>Pick the people rather than asking for volunteers, and pick at least one person whose question <em>didn't</em> work. A share-back of four successes teaches the room less than one honest dead end.</p>
+    <p>Three at 30 seconds each plus discussion is about five minutes. If you're at 55 already, take two.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">21</span><span class="clock">57:00</span><span class="btitle">Take it away</span></div>
+  <div class="say">
+    <p>The sandbox stays up with the same login. Break it however you like, nothing in it matters.</p>
+    <p>Before session four: build three charts from your own backlog, the things people actually ask you for. Anything you can't build, bring it and we'll do it together. Install the Event Explorer extension if you didn't get to it today.</p>
+    <p>And the full tracking plan for this sandbox is written up, every event, every property and every trap including the ones I didn't get to. Link's in the invite.</p>
+  </div>
+</div>
+
+<div class="slide-block">
+  <div class="bhead"><span class="sn">22</span><span class="clock">58:30</span><span class="btitle">Next session</span></div>
+  <div class="say">
+    <p>Session four is identity and the pipeline. The tag manager, the SDKs, server-side events, and how three IDs resolve into one person.</p>
+    <p>We'll open with the thing you found in the first ten minutes today: one hardcoded customer number, eight people, one profile, and no error anywhere.</p>
+    <p>Questions, and tell me if you'd rather do something different next time. The order still isn't fixed.</p>
+  </div>
+</div>
+
+<!-- ═══════════════ APPENDIX ═══════════════ -->
+
+<h2 class="sec">Questions to expect</h2>
+<p class="subhead">And which ones to take away rather than answer live</p>
+
+<table class="q">
+  <thead><tr><th>They ask</th><th>Answer</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="qq">Where's the freeform table?</td>
+      <td>Data Table is the nearest thing, and it isn't like for like. Be specific about what's genuinely different rather than defending it, and get the missing capability onto the list.</td>
+    </tr>
+    <tr>
+      <td class="qq">Can we do calculated metrics?</td>
+      <td>There are formula metrics in the segmentation and table charts. If someone names a specific Adobe calculated metric they need replicated, write it down and take it away. Guessing live here is how you end up wrong in front of the room.</td>
+    </tr>
+    <tr>
+      <td class="qq">Why don't these numbers match Adobe?</td>
+      <td>Several legitimate reasons, and you can name three today: the conversion window is explicit, sessions are an inactivity gap rather than a hit-based visit, and the two sources in this sandbox have different coverage. Don't promise parity.</td>
+    </tr>
+    <tr>
+      <td class="qq">Why isn't property X in the dropdown?</td>
+      <td>Usually one of three things: it's live only and there's no data in the window, the array hasn't been split, or it's the scope question from session 2. Check the window first, it's the common case.</td>
+    </tr>
+    <tr>
+      <td class="qq">Can we get hit-level data out?</td>
+      <td>Yes, through the export API and the warehouse sync. That's session 4 territory, so park it.</td>
+    </tr>
+    <tr>
+      <td class="qq">Is there a virtual report suite equivalent?</td>
+      <td>Not as a single feature. Depending on what they used it for the answer is saved segments, separate projects, or permissions. Ask what they used theirs for before answering.</td>
+    </tr>
+    <tr>
+      <td class="qq">Who can create charts, and can we stop them?</td>
+      <td>Governance question, and a real one. Park it and bring it back properly rather than half-answering it at minute 55.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="sec">Pre-flight</h2>
+<p class="subhead">The day before, in the sandbox, with the site open</p>
+
+<div class="note">
+  <span class="lbl">The one that breaks everything</span>
+  <p>Confirm the <code>Products</code> property is split in this project, with type Array and item type Any. Splitting isn't retroactive for data already ingested, so if it's off, the cart breakdowns in blocks 7 and 13 have nothing to show and cannot be fixed on the day.</p>
+</div>
+
+<ul class="check">
+  <li>Every attendee has a working sandbox login. Check 48 hours ahead, not on the morning.</li>
+  <li>Pre-read sent: bring one question you answer in Adobe today, and install the Event Explorer extension.</li>
+  <li>Run one purchase yourself on the site and confirm the <code>Products</code> array arrives with all seven child properties.</li>
+  <li>Walk all four chart builds once, in this project, and correct any control names in the deck that have moved.</li>
+  <li>Confirm Journeys and User Sessions have enough data in this project to show something worth looking at.</li>
+  <li>Check what values the address check actually sends for its result property, so the block 15 filter matches.</li>
+  <li>Confirm Session Replay is ingesting in this project, not merely being sent by the site, before promising the optional replay moment in block 9.</li>
+  <li>Check the Guides &amp; Surveys toggle is on in your own demo panel, and know where it is so you can check someone else's.</li>
+  <li>Have slide 19 reachable in one keystroke. You will need it.</li>
+  <li>Decide now whether you're cutting blocks 15 and 16, based on how much block 12 ran over last time you taught something like it.</li>
+</ul>
+
+<h2 class="sec">Reference</h2>
+<p class="subhead">Links and the handful of magic strings</p>
+
+<div class="urlbar">Sandbox · app.amplitude.com/analytics/steep-bush-453227</div>
+<div class="urlbar">Demo site · shermozle.github.io/telstra-demo</div>
+<div class="urlbar">Site source · github.com/shermozle/telstra-demo</div>
+
+<ul>
+  <li><code>ONLINE50</code> and <code>PROMO20</code> are the two working promo codes. Anything else returns an invalid result, which is itself a usable event.</li>
+  <li><code>2003964661</code> is the customer ID every logged-in visitor becomes.</li>
+  <li><code>Ctrl+Shift+D</code> opens the site's demo panel, <code>Ctrl+Shift+R</code> resets its demo data.</li>
+  <li>The four events carrying the <code>Products</code> array: add to cart, checkout started, checkout step completed, order placed.</li>
+</ul>
+
+</div>

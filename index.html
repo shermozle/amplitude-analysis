@@ -1,0 +1,147 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 3 — Analysis &amp; Debugging</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300..600&display=swap">
+
+<style>
+:root {
+  --ground:#FFFFFF; --panel:#F5F7FB; --panel-2:#EBEFF7;
+  --line:#DCE2EC; --line-hi:#B9C3D4;
+  --text:#111721; --dim:#4E5967; --faint:#7C8797;
+  --accent:#2450CE; --accent-bg:#EBF0FE;
+  --amp:#0B7A62; --amp-bg:#E6F5F1;
+  --warn:#A8541A; --warn-bg:#FDF3E9;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --disp:"Archivo",var(--sans);
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:#0A0D13; --panel:#141A25; --panel-2:#1C2431;
+    --line:#27303E; --line-hi:#3D4A5D;
+    --text:#EFF3F9; --dim:#A2AEC0; --faint:#6E7A8B;
+    --accent:#7FA6FF; --accent-bg:#101A31;
+    --amp:#2FD9AE; --amp-bg:#0C2C26;
+    --warn:#FFB067; --warn-bg:#241A0E;
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"] {
+  --ground:#0A0D13; --panel:#141A25; --panel-2:#1C2431;
+  --line:#27303E; --line-hi:#3D4A5D;
+  --text:#EFF3F9; --dim:#A2AEC0; --faint:#6E7A8B;
+  --accent:#7FA6FF; --accent-bg:#101A31;
+  --amp:#2FD9AE; --amp-bg:#0C2C26;
+  --warn:#FFB067; --warn-bg:#241A0E;
+  --shadow:none;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:0 22px 80px;background:var(--ground);color:var(--text);
+  font-family:var(--sans);font-weight:300;font-size:16px;line-height:1.55}
+.wrap{max-width:800px;margin:0 auto}
+
+header{padding:56px 0 0}
+h1{font-family:var(--disp);font-variation-settings:"wdth" 106,"wght" 800;
+  font-size:38px;line-height:1.06;letter-spacing:-.03em;margin:0}
+.sub{color:var(--dim);font-size:18px;margin:12px 0 0;max-width:62ch}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.meta span{font-family:var(--mono);font-size:12px;letter-spacing:.05em;
+  border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--dim)}
+
+.cards{display:grid;gap:12px;margin-top:34px}
+a.cta{display:block;text-decoration:none;color:inherit;
+  border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:0 14px 14px 0;padding:20px 24px;background:var(--panel);
+  box-shadow:var(--shadow);transition:border-color .15s ease,background .15s ease}
+a.cta:hover{border-color:var(--line-hi);border-left-color:var(--accent);background:var(--panel-2)}
+a.cta.live{border-left-color:var(--amp)}
+a.cta.live:hover{border-left-color:var(--amp)}
+a.cta h2{font-family:var(--disp);font-variation-settings:"wdth" 102,"wght" 750;
+  font-size:21px;margin:0 0 6px;letter-spacing:-.02em}
+a.cta p{margin:0;color:var(--dim);font-size:15.5px}
+a.cta .go{font-family:var(--mono);font-size:11.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--accent);display:block;margin-top:11px;overflow-wrap:anywhere}
+a.cta.live .go{color:var(--amp)}
+
+h3{font-family:var(--disp);font-variation-settings:"wdth" 100,"wght" 700;
+  font-size:17px;margin:44px 0 12px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--faint);font-weight:400;
+  padding:0 12px 8px 0;border-bottom:1px solid var(--line-hi)}
+td{padding:10px 12px 10px 0;border-bottom:1px solid var(--line);
+  color:var(--dim);vertical-align:top;line-height:1.45}
+td.m{font-family:var(--mono);font-size:12.5px;color:var(--amp);white-space:nowrap;width:76px}
+td.t{color:var(--text);font-weight:500;width:26%;white-space:nowrap}
+@media (max-width:560px){ table,tbody,tr,td,th{display:block} thead{display:none}
+  tr{border-bottom:1px solid var(--line);padding:10px 0}
+  td{border:0;padding:2px 0;width:auto} td.t{width:auto} }
+
+.note{margin-top:34px;border:1px solid var(--line);border-left:3px solid var(--warn);
+  background:var(--warn-bg);border-radius:0 10px 10px 0;padding:14px 16px;
+  font-size:14.5px;color:var(--dim)}
+.note b{color:var(--text)}
+footer{margin-top:54px;padding-top:20px;border-top:1px solid var(--line);
+  color:var(--faint);font-size:13.5px}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Analysis, and how to tell when it's lying</h1>
+    <p class="sub">Session 3 of the enablement series. Four chart types, three debugging tools, and one chart each that answers a question you already answer in Adobe.</p>
+    <div class="meta"><span>Session 3</span><span>60 min</span><span>Hands-on</span><span>22 slides</span></div>
+  </header>
+
+  <div class="cards">
+    <a class="cta" href="handout.html">
+      <h2>Participant handout</h2>
+      <p>The six exercises with their done-when lines, the event and property cheat sheet, the four traps in this data, and a worksheet for your own question. This is the one to have open during the session.</p>
+      <span class="go">handout.html →</span>
+    </a>
+
+    <a class="cta" href="slides.html">
+      <h2>Slides</h2>
+      <p>Presenter deck. F for full screen, O to jump, T for the timer that knows the run of show.</p>
+      <span class="go">slides.html →</span>
+    </a>
+
+    <a class="cta" href="talk-track.html">
+      <h2>Talk track</h2>
+      <p>Facilitator notes per slide, with cut points, the questions to expect, and the pre-flight checklist.</p>
+      <span class="go">talk-track.html →</span>
+    </a>
+
+    <a class="cta live" href="https://app.amplitude.com/analytics/steep-bush-453227">
+      <h2>The sandbox</h2>
+      <p>Where you build. One project, fed by a month of generated history and by the live demo site.</p>
+      <span class="go">app.amplitude.com/analytics/steep-bush-453227 →</span>
+    </a>
+
+    <a class="cta live" href="https://shermozle.github.io/telstra-demo">
+      <h2>The demo site</h2>
+      <p>Devices on plans, accessories, nbn and 5G home internet, a cart, a four-step checkout, a My Telstra area. Clicking it generates real events into the sandbox.</p>
+      <span class="go">shermozle.github.io/telstra-demo →</span>
+    </a>
+  </div>
+
+  <h3>Run of show</h3>
+  <table>
+    <thead><tr><th>Mins</th><th>Section</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td class="m">0–5</td><td class="t">Frame</td><td>Everyone logged in. One project, two sources.</td></tr>
+      <tr><td class="m">5–15</td><td class="t">The toolkit</td><td>Make your own data, then follow it through Event Explorer, the Ingestion Debugger and User Lookup.</td></tr>
+      <tr><td class="m">15–37</td><td class="t">Four charts</td><td>Data Table, Funnel, Journeys, User Sessions. Build-along.</td></tr>
+      <tr><td class="m">37–52</td><td class="t">Your chart</td><td>One question each, from your own Adobe work.</td></tr>
+      <tr><td class="m">52–60</td><td class="t">Close</td><td>Share-backs, what's missing from the taxonomy, session 4.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <b>Two sources, one project.</b> About a month of generated history sits alongside live events from the demo site. They share event names but not contents, and knowing which is which explains nearly every odd number in the session.
+  </div>
+
+  <footer>Telstra × Amplitude enablement · Session 3 of 5</footer>
+</div>

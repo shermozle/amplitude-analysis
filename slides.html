@@ -1,0 +1,1042 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amplitude for Adobe Implementers — Session 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300..600&display=swap">
+
+<!--
+  TELSTRA × AMPLITUDE — SESSION 3 OF 5
+  ════════════════════════════════════
+  60 minutes, hands-on. Audience: Telstra implementers with deep Adobe knowledge.
+  Everyone has a laptop, a sandbox login, and the demo site open.
+
+  Presenter controls:
+    · Full-screen button (top left) or F
+    · Jump menu — O
+    · Timer aware of the run of show — T (R resets)
+    · Deep links — slides.html#12
+    · Print — Cmd-P for one slide per page
+
+  Run of show (ACT_END at the bottom drives the timer):
+    Frame         0–5     slides 1–4
+    The toolkit   5–15    slides 5–9
+    Four charts   15–37   slides 10–16
+    Your chart    37–52   slides 17–19
+    Close         52–60   slides 20–22
+-->
+
+<style>
+:root {
+  --ground:   #0A0D13;
+  --panel:    #141A25;
+  --line:     #262F3D;
+  --line-hi:  #38445A;
+  --text:     #F0F3F8;
+  --dim:      #94A0B3;
+  --faint:    #636E80;
+
+  --accent:   #5B8DFF;   /* structure */
+  --signal:   #2FD9AE;   /* live, verified, "watch this" */
+  --action:   #FFA24C;   /* your turn */
+  --action-ink:#33210D;
+
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --disp: "Archivo", var(--sans);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0; height: 100%;
+  background: var(--ground); color: var(--text);
+  font-family: var(--sans); overflow: hidden;
+}
+
+#viewport {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--ground);
+}
+#stage {
+  width: 1280px; height: 720px;
+  position: relative; transform-origin: center center; flex: none;
+}
+
+.slide {
+  position: absolute; inset: 0;
+  padding: 54px 72px 76px;
+  display: none; flex-direction: column;
+  background: var(--ground);
+}
+.slide.on { display: flex; }
+.body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
+
+/* ---------- furniture ---------- */
+
+.eyebrow {
+  font-family: var(--mono); font-size: 12px;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--faint);
+  display: flex; align-items: center; gap: 12px; flex: none;
+}
+.eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: none; }
+.eyebrow .mins { margin-left: auto; letter-spacing: .1em; }
+
+h1.cover-title {
+  font-family: var(--disp);
+  font-variation-settings: "wdth" 112, "wght" 800;
+  font-size: 84px; line-height: .98; letter-spacing: -.035em; margin: 0; max-width: 22ch;
+}
+h2.head {
+  font-family: var(--disp);
+  font-variation-settings: "wdth" 104, "wght" 750;
+  font-size: 40px; line-height: 1.08; letter-spacing: -.022em;
+  margin: 14px 0 0; text-wrap: balance; max-width: 30ch;
+}
+p.deck { font-size: 21px; line-height: 1.45; color: var(--dim); font-weight: 300; margin: 16px 0 0; max-width: 62ch; }
+p.deck strong { color: var(--text); font-weight: 500; }
+.kicker {
+  font-family: var(--mono); font-size: 13px;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--signal); margin: 0 0 6px;
+}
+.caption { margin: 14px 0 0; font-size: 15.5px; color: var(--faint); font-weight: 300; max-width: 86ch; line-height: 1.45; }
+.caption b { color: var(--dim); font-weight: 500; }
+.caption code { font-family: var(--mono); font-size: 14px; color: var(--dim); }
+
+/* ---------- section divider ---------- */
+
+.act-num {
+  font-family: var(--disp);
+  font-variation-settings: "wdth" 125, "wght" 800;
+  font-size: 132px; line-height: .8; margin: 0;
+  color: transparent; -webkit-text-stroke: 2px var(--line-hi); letter-spacing: -.04em;
+}
+.act-slide h1 {
+  font-family: var(--disp);
+  font-variation-settings: "wdth" 110, "wght" 800;
+  font-size: 72px; line-height: 1; letter-spacing: -.032em; margin: 6px 0 0;
+}
+.contains { margin: 30px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px 10px; max-width: 60ch; }
+.contains li {
+  font-family: var(--mono); font-size: 13px; color: var(--dim);
+  border: 1px solid var(--line); border-radius: 999px; padding: 6px 13px;
+}
+
+/* ---------- rows (term / definition) ---------- */
+
+.rows { margin: 20px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+.rows li {
+  display: grid; grid-template-columns: 250px minmax(0, 1fr);
+  gap: 22px; align-items: baseline;
+  padding: 10px 2px; border-bottom: 1px solid var(--line);
+}
+.rows li:first-child { border-top: 1px solid var(--line); }
+.rows .term { font-family: var(--disp); font-variation-settings: "wdth" 100, "wght" 700; font-size: 17.5px; }
+.rows .term.mono { font-family: var(--mono); font-size: 14px; font-variation-settings: normal; color: var(--signal); }
+.rows .def { font-size: 15.5px; line-height: 1.42; color: var(--dim); font-weight: 300; }
+.rows .def strong { color: var(--text); font-weight: 500; }
+.rows .def code { font-family: var(--mono); font-size: 14px; color: var(--signal); }
+/* .rows li is a grid whose direct children are exactly two spans, so inline
+   markup nested inside them is safe. Never make a list item a grid container
+   when <strong>/<code> are its direct children — each would become a cell. */
+
+/* ---------- comparison table ---------- */
+
+.cmp { margin: 20px 0 0; width: 100%; border-collapse: collapse; table-layout: fixed; }
+.cmp th {
+  text-align: left; font-family: var(--mono); font-size: 11px;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--faint);
+  padding: 0 16px 9px 0; border-bottom: 1px solid var(--line-hi); font-weight: 400;
+}
+.cmp td {
+  padding: 10px 16px 10px 0; border-bottom: 1px solid var(--line);
+  font-size: 15px; line-height: 1.34; color: var(--dim); font-weight: 300; vertical-align: top;
+}
+.cmp td.a { color: var(--text); font-weight: 500; }
+.cmp td.b { color: var(--signal); font-family: var(--mono); font-size: 13.5px; }
+.cmp tr:last-child td { border-bottom: 0; }
+
+/* ---------- cards ---------- */
+
+.grid { display: grid; gap: 16px; margin-top: 22px; }
+.grid.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 7px; min-width: 0;
+}
+.card .tag { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+.card.signal .tag { color: var(--signal); }
+.card.action .tag { color: var(--action); }
+.card h3 { font-family: var(--disp); font-variation-settings: "wdth" 100, "wght" 700; font-size: 20px; line-height: 1.15; margin: 0; }
+.card p { margin: 0; font-size: 15px; line-height: 1.44; color: var(--dim); font-weight: 300; }
+.card p code { font-family: var(--mono); font-size: 14px; color: var(--signal); }
+.card ul { margin: 2px 0 0; padding-left: 17px; }
+.card li { font-size: 14.5px; line-height: 1.5; color: var(--dim); font-weight: 300; }
+
+/* ---------- code ---------- */
+
+pre.code {
+  margin: 18px 0 0; background: var(--panel);
+  border: 1px solid var(--line); border-left: 3px solid var(--signal); border-radius: 10px;
+  padding: 18px 22px; font-family: var(--mono); font-size: 14.5px; line-height: 1.58;
+  color: var(--text); overflow-x: auto; white-space: pre; tab-size: 2;
+}
+pre.code .c { color: var(--faint); }
+pre.code .s { color: var(--signal); }
+pre.code .k { color: var(--accent); }
+pre.code .hl { color: var(--action); }
+
+/* ---------- tool / demo slides ---------- */
+
+.slide.demo { background: linear-gradient(180deg, #0A1A17 0%, var(--ground) 62%); }
+.slide.demo .eyebrow .dot { background: var(--signal); }
+
+/* ---------- exercise slides: your turn ---------- */
+
+.slide.ex { background: linear-gradient(180deg, #221703 0%, var(--ground) 62%); }
+.slide.ex .eyebrow .dot { background: var(--action); }
+.slide.ex .kicker { color: var(--action); }
+.slide.ex .station .snum { color: var(--action); }
+.slide.ex .steps li::before { color: var(--action); border-color: var(--action-ink); background: var(--action-ink); }
+.slide.ex .steps li code { color: var(--action); }
+.slide.ex .rows .def code, .slide.ex .rows .term.mono { color: var(--action); }
+
+.station { display: flex; align-items: baseline; gap: 16px; margin-top: 10px; }
+.station .snum {
+  font-family: var(--disp); font-variation-settings: "wdth" 118, "wght" 800;
+  font-size: 44px; line-height: 1; color: var(--signal); flex: none;
+}
+.station h2 { font-family: var(--disp); font-variation-settings: "wdth" 104, "wght" 750; font-size: 38px; margin: 0; letter-spacing: -.02em; }
+
+/* Block li with an absolutely positioned marker — NOT display:grid, which
+   would put every nested <strong> and <code> in its own cell. */
+.steps { margin: 18px 0 0; padding: 0; list-style: none; counter-reset: st; display: flex; flex-direction: column; gap: 10px; }
+.steps li {
+  position: relative; padding-left: 42px;
+  font-size: 17px; line-height: 1.4; color: var(--dim); font-weight: 300;
+}
+.steps li::before {
+  counter-increment: st; content: counter(st);
+  position: absolute; left: 0; top: 3px; width: 26px; padding: 3px 0;
+  font-family: var(--mono); font-size: 13px; color: var(--signal);
+  border: 1px solid #0C2C26; background: #0C2C26;
+  border-radius: 6px; text-align: center;
+}
+.steps li strong { color: var(--text); font-weight: 500; }
+.steps li code { font-family: var(--mono); font-size: 14.5px; color: var(--signal); }
+.steps li .aside { display: block; font-size: 14.5px; color: var(--faint); margin-top: 2px; }
+
+/* ---------- done-when / discussion ---------- */
+
+.donewhen {
+  margin: 18px 0 0; border: 1px solid var(--line); border-left: 3px solid var(--action);
+  background: var(--action-ink); border-radius: 0 10px 10px 0; padding: 12px 18px;
+  font-size: 16px; line-height: 1.4; color: var(--dim); font-weight: 300;
+}
+.donewhen b {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--action); display: block; margin-bottom: 4px; font-weight: 500;
+}
+.ask {
+  margin: 16px 0 0; font-size: 17px; line-height: 1.4; color: var(--text);
+  border-left: 3px solid var(--line-hi); padding-left: 16px; font-weight: 300; max-width: 78ch;
+}
+
+.pill-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+.pill {
+  font-family: var(--mono); font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase;
+  padding: 7px 13px; border-radius: 999px; border: 1px solid var(--line); color: var(--dim);
+}
+.pill.hot { border-color: var(--signal); color: var(--signal); }
+
+/* ---------- URL callout ---------- */
+
+.urlbox {
+  margin-top: 20px; border: 1px solid var(--signal); background: #0C2C26;
+  border-radius: 12px; padding: 14px 24px;
+  display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+}
+.urlbox + .urlbox { margin-top: 10px; }
+.urlbox .lbl { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--signal); flex: none; min-width: 108px; }
+.urlbox .u { font-family: var(--mono); font-size: 20px; color: var(--text); font-weight: 500; overflow-wrap: anywhere; }
+.slide.ex .urlbox { border-color: var(--action); background: var(--action-ink); }
+.slide.ex .urlbox .lbl { color: var(--action); }
+
+/* ---------- session list ---------- */
+
+.sessions { margin: 22px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0; }
+.sessions li {
+  display: grid; grid-template-columns: 52px 210px minmax(0, 1fr);
+  gap: 18px; align-items: baseline; padding: 12px 2px; border-bottom: 1px solid var(--line);
+}
+.sessions li:first-child { border-top: 1px solid var(--line); }
+.sessions li.now { background: #0C2C26; }
+.sessions .sn { font-family: var(--mono); font-size: 13px; color: var(--faint); }
+.sessions li.now .sn { color: var(--signal); }
+.sessions .st { font-family: var(--disp); font-variation-settings: "wdth" 100, "wght" 700; font-size: 17.5px; }
+.sessions .sd { font-size: 15.5px; line-height: 1.4; color: var(--dim); font-weight: 300; }
+
+/* ---------- flow diagram ---------- */
+
+.flow { margin: 24px 0 0; display: flex; align-items: stretch; gap: 10px; }
+.flow .node {
+  flex: 1 1 0; min-width: 0; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 10px; padding: 14px 15px; display: flex; flex-direction: column; gap: 5px;
+}
+.flow .node.hi { border-color: var(--signal); background: #0C2C26; }
+.flow .node .nt { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.flow .node.hi .nt { color: var(--signal); }
+.flow .node .nn { font-family: var(--disp); font-variation-settings: "wdth" 100, "wght" 700; font-size: 16px; line-height: 1.15; }
+.flow .node .nd { font-size: 13.5px; line-height: 1.35; color: var(--dim); font-weight: 300; }
+.flow .arr { flex: 0 0 14px; display: flex; align-items: center; justify-content: center; color: var(--line-hi); font-size: 17px; }
+
+/* ---------- rail ---------- */
+
+#rail {
+  position: absolute; left: 72px; right: 72px; bottom: 28px;
+  display: flex; align-items: flex-end; gap: 3px; height: 22px; pointer-events: none;
+}
+#rail .tick { flex: 1 1 auto; height: 3px; background: var(--line); border-radius: 1px; transition: height .18s ease, background .18s ease; }
+#rail .tick.seen { background: var(--line-hi); }
+#rail .tick.now { height: 13px; background: var(--signal); }
+#rail .tick.gap { flex: 0 0 12px; background: transparent; }
+
+#stamp {
+  position: absolute; right: 72px; bottom: 54px;
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em;
+  color: var(--faint); font-variant-numeric: tabular-nums; pointer-events: none;
+}
+
+/* ---------- full-screen button ---------- */
+
+#fsbtn {
+  position: fixed; top: 14px; left: 16px; z-index: 40;
+  display: flex; align-items: center; gap: 8px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  padding: 7px 11px; color: var(--dim); cursor: pointer;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  opacity: .38; transition: opacity .18s ease, color .18s ease, border-color .18s ease;
+}
+#fsbtn:hover { opacity: 1; color: var(--text); border-color: var(--line-hi); }
+#fsbtn:focus-visible { opacity: 1; outline: 2px solid var(--signal); outline-offset: 2px; }
+#fsbtn svg { width: 13px; height: 13px; flex: none; }
+#fsbtn .exit { display: none; }
+body.isfull #fsbtn .enter { display: none; }
+body.isfull #fsbtn .exit { display: block; }
+
+/* ---------- timer ---------- */
+
+#timer {
+  position: fixed; top: 14px; right: 16px; z-index: 40;
+  font-family: var(--mono); font-size: 12px; letter-spacing: .08em;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  padding: 7px 12px; color: var(--dim);
+  display: none; gap: 12px; align-items: center; font-variant-numeric: tabular-nums;
+}
+#timer.on { display: flex; }
+#timer .clock { color: var(--text); font-size: 14px; font-weight: 600; }
+#timer.ahead .delta { color: var(--signal); }
+#timer.late .delta { color: #FF7A85; }
+
+/* ---------- jump menu ---------- */
+
+#jump { position: fixed; inset: 0; z-index: 60; background: #06080C; display: none; padding: 40px 48px; overflow-y: auto; }
+#jump.on { display: block; }
+#jump h2 { font-family: var(--disp); font-variation-settings: "wdth" 108, "wght" 800; font-size: 26px; margin: 0 0 4px; }
+#jump .hint { font-family: var(--mono); font-size: 11.5px; color: var(--faint); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 26px; }
+#jump .acts { columns: 3; column-gap: 40px; }
+@media (max-width: 1000px) { #jump .acts { columns: 2; } }
+#jump .act-grp { break-inside: avoid; margin-bottom: 24px; }
+#jump .act-grp h3 {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--signal); margin: 0 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--line);
+}
+#jump ol { list-style: none; margin: 0; padding: 0; }
+#jump button {
+  display: flex; gap: 10px; width: 100%; background: none; border: 0; cursor: pointer;
+  text-align: left; padding: 5px 7px; border-radius: 6px;
+  font-family: var(--sans); font-size: 14px; color: var(--dim); align-items: baseline;
+}
+#jump button:hover { background: var(--panel); color: var(--text); }
+#jump button.cur { color: var(--signal); }
+#jump button .n { font-family: var(--mono); font-size: 11px; color: var(--faint); min-width: 20px; font-variant-numeric: tabular-nums; }
+
+#help { position: fixed; inset: 0; z-index: 70; background: #06080C; display: none; align-items: center; justify-content: center; }
+#help.on { display: flex; }
+#help h2 { font-family: var(--disp); font-variation-settings: "wdth" 108, "wght" 800; font-size: 28px; margin: 0 0 20px; }
+#help dl { display: grid; grid-template-columns: auto 1fr; gap: 11px 20px; margin: 0; font-size: 15px; max-width: 520px; }
+#help dt { font-family: var(--mono); font-size: 13px; color: var(--signal); }
+#help dd { margin: 0; color: var(--dim); font-weight: 300; }
+
+#nudge {
+  position: fixed; bottom: 14px; left: 16px; z-index: 30;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .08em;
+  color: var(--faint); opacity: .55; transition: opacity .4s ease;
+}
+#nudge.hide { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) { #rail .tick, #nudge, #fsbtn { transition: none; } }
+
+/* ---------- print / PDF fallback ---------- */
+
+@media print {
+  @page { size: 1280px 720px; margin: 0; }
+  html, body { overflow: visible; height: auto; background: #fff; }
+  #viewport { position: static; display: block; }
+  #stage { width: 1280px; height: auto; transform: none !important; }
+  .slide { position: static; display: flex !important; width: 1280px; height: 720px; page-break-after: always; }
+  #timer, #jump, #help, #nudge, #fsbtn { display: none !important; }
+}
+</style>
+
+<div id="viewport">
+  <div id="stage">
+
+<!-- ═══════════════ SLIDES ═══════════════ -->
+
+<!-- ─────────── ACT 0 · FRAME ─────────── -->
+
+<section class="slide" data-act="0" data-title="Cover">
+  <div class="body">
+    <p class="kicker">Telstra × Amplitude · Session 3 of 5</p>
+    <h1 class="cover-title">Analysis, and how to tell when it's lying.</h1>
+    <p class="deck" style="font-size:23px;margin-top:24px">Four chart types, three debugging tools, and one chart each that answers a question you already answer in Adobe.</p>
+    <p class="caption" style="margin-top:26px">Simon Rumble · Senior Solution Engineer · Laptops open, please</p>
+  </div>
+</section>
+
+<section class="slide" data-act="0" data-title="Where we are">
+  <div class="eyebrow"><span class="dot"></span>Frame<span class="mins">5 min</span></div>
+  <div class="body">
+    <h2 class="head">Where we are</h2>
+    <ul class="sessions">
+      <li>
+        <span class="sn">01</span><span class="st">How it works</span>
+        <span class="sd">Done. The model, the vocabulary, a demo.</span>
+      </li>
+      <li>
+        <span class="sn">02</span><span class="st">Events &amp; taxonomy</span>
+        <span class="sd">Done. Hits and eVars mapped onto events and properties.</span>
+      </li>
+      <li class="now">
+        <span class="sn">03</span><span class="st">Analysis</span>
+        <span class="sd">Today. You build the charts, and you learn to distrust them.</span>
+      </li>
+      <li>
+        <span class="sn">04</span><span class="st">Identity &amp; the pipeline</span>
+        <span class="sd">Next. The tag manager, the SDKs, server-side, how identity resolves.</span>
+      </li>
+      <li>
+        <span class="sn">05</span><span class="st">Beyond analytics</span>
+        <span class="sd">Replay, experiments, guides, activation off the same stream.</span>
+      </li>
+    </ul>
+    <p class="caption">Today is the first session where you drive. I'll build alongside you on the screen, at a pace that assumes you're following on your own laptop.</p>
+  </div>
+</section>
+
+<section class="slide" data-act="0" data-title="What you need open">
+  <div class="eyebrow"><span class="dot"></span>Frame<span class="mins">5 min</span></div>
+  <div class="body">
+    <p class="kicker">Two tabs, now, before I say anything else</p>
+    <h2 class="head" style="margin-bottom:4px">What you need open</h2>
+    <div class="urlbox">
+      <span class="lbl">Sandbox</span>
+      <span class="u">app.amplitude.com/analytics/steep-bush-453227</span>
+    </div>
+    <div class="urlbox">
+      <span class="lbl">Demo site</span>
+      <span class="u">shermozle.github.io/telstra-demo</span>
+    </div>
+    <p class="caption" style="margin-top:20px">If your sandbox login doesn't work, say so now rather than at minute forty. <b>Don't touch the API key field</b> in the site's demo panel: it redirects your events to a project none of us can see.</p>
+  </div>
+</section>
+
+<section class="slide" data-act="0" data-title="One project, two sources">
+  <div class="eyebrow"><span class="dot"></span>Frame<span class="mins">5 min</span></div>
+  <div class="body">
+    <h2 class="head">One project, two sources</h2>
+    <div class="flow">
+      <div class="node">
+        <span class="nt">Source A</span>
+        <span class="nn">Generated history</span>
+        <span class="nd">About a month of backdated behaviour, so charts have something to show. Telco journeys, but a fashion catalogue in the cart.</span>
+      </div>
+      <div class="arr">→</div>
+      <div class="node hi">
+        <span class="nt">One project</span>
+        <span class="nn">The sandbox</span>
+        <span class="nd">Both sources use the same event and property names. 19 events have history; the other 21 are live only.</span>
+      </div>
+      <div class="arr">←</div>
+      <div class="node">
+        <span class="nt">Source B</span>
+        <span class="nn">The live site</span>
+        <span class="nd">Browser SDK, autocapture and Session Replay on. Whatever you click in the next hour lands here within seconds.</span>
+      </div>
+    </div>
+    <p class="caption">Hold onto this. The two sources agree on <b>names</b>, not on <b>contents</b>. Nearly every confusing number you meet today traces back to that sentence, and the habit of asking which sources feed a chart is the thing I most want you to take away.</p>
+  </div>
+</section>
+
+<!-- ─────────── ACT 1 · THE TOOLKIT ─────────── -->
+
+<section class="slide act-slide" data-act="1" data-title="Act 1 divider">
+  <div class="body">
+    <p class="act-num">01</p>
+    <h1>The toolkit</h1>
+    <ul class="contains">
+      <li>Make some data</li><li>Event Explorer</li><li>Ingestion Debugger</li><li>User Lookup</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide ex" data-act="1" data-title="Exercise · make some data">
+  <div class="eyebrow"><span class="dot"></span>The toolkit<span class="mins">10 min</span></div>
+  <div class="body">
+    <div class="station"><span class="snum">01</span><h2>Make some data</h2></div>
+    <ul class="steps">
+      <li><strong>Stay logged out.</strong> Your device ID is yours alone while you're anonymous, and that makes you findable later.</li>
+      <li>Open a mobile phone on a plan, pick a colour and a storage size, choose a plan, add it to the cart.</li>
+      <li>In the cart, apply the promo code <code>ONLINE50</code>.</li>
+      <li>Check out. Four steps, any values you like in the form fields.</li>
+    </ul>
+    <div class="donewhen">
+      <b>Done when</b>
+      You've placed an order, and you can name three events you think you just sent.
+    </div>
+  </div>
+</section>
+
+<section class="slide demo" data-act="1" data-title="What left the browser">
+  <div class="eyebrow"><span class="dot"></span>The toolkit<span class="mins">10 min</span></div>
+  <div class="body">
+    <p class="kicker">Tool 1 of 3 · in the browser</p>
+    <h2 class="head">What left the browser</h2>
+    <div class="grid c2">
+      <div class="card signal">
+        <span class="tag">Event Explorer</span>
+        <h3>Chrome extension</h3>
+        <p>Sits in the page and lists every event as it's sent, with its full property payload, plus your device ID and session ID. Your nearest Adobe habit is the Experience Platform debugger or a packet monitor.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Fallback</span>
+        <h3>The site's own log</h3>
+        <p>Gear button, bottom right, or <code>Ctrl+Shift+D</code>. The demo site logs every <code>track()</code> call it makes. Useful when you haven't got the extension installed, and useful in general when a site is instrumented well.</p>
+      </div>
+    </div>
+    <p class="caption">This answers one question: <b>did it fire, and with what</b>. Open your <code>Order Placed</code> and look at the <code>Products</code> array. One object per line item, which is where the cart analysis in the next act comes from.</p>
+  </div>
+</section>
+
+<section class="slide demo" data-act="1" data-title="What Amplitude accepted">
+  <div class="eyebrow"><span class="dot"></span>The toolkit<span class="mins">10 min</span></div>
+  <div class="body">
+    <p class="kicker">Tool 2 of 3 · in Amplitude, under Data</p>
+    <h2 class="head">What Amplitude accepted</h2>
+    <ul class="rows">
+      <li><span class="term">Ingestion Debugger</span><span class="def">A live view of events arriving at the server, with the raw payload as received.</span></li>
+      <li><span class="term">Why it's separate</span><span class="def">The extension shows what <strong>left the browser</strong>. This shows what Amplitude <strong>kept</strong>. Blocked events, filtered properties and type mismatches only show up here.</span></li>
+      <li><span class="term">The failure it catches</span><span class="def">Instrumentation that looks perfect in the browser and produces nothing in a chart. Any gap between these two views is a configuration problem, not a code problem.</span></li>
+    </ul>
+    <p class="ask">If the extension shows the event and this doesn't, where would you look first?</p>
+  </div>
+</section>
+
+<section class="slide demo" data-act="1" data-title="One user's actual events">
+  <div class="eyebrow"><span class="dot"></span>The toolkit<span class="mins">10 min</span></div>
+  <div class="body">
+    <p class="kicker">Tool 3 of 3 · the one you'll use most</p>
+    <h2 class="head">One user's actual events</h2>
+    <p class="deck"><strong>User Lookup</strong> gives you one person's events in order, with every property, and every user-property change marked where it happened. It's what you open when someone tells you a report is wrong.</p>
+    <div class="donewhen" style="border-left-color:var(--signal);background:#0C2C26">
+      <b style="color:var(--signal)">Try this</b>
+      Search User Lookup for user ID <code style="font-family:var(--mono);color:var(--signal)">2003964661</code>. Then log in on the site, as anyone, and look again.
+    </div>
+    <p class="caption">Everyone who logs in becomes that same ID, because the site hardcodes one customer number. Eight people's sessions, one user profile, no error anywhere. That's a real implementation bug of a kind you will meet, and it's the opening example of session 4.</p>
+  </div>
+</section>
+
+<!-- ─────────── ACT 2 · FOUR CHARTS ─────────── -->
+
+<section class="slide act-slide" data-act="2" data-title="Act 2 divider">
+  <div class="body">
+    <p class="act-num">02</p>
+    <h1>Four charts</h1>
+    <ul class="contains">
+      <li>Data Table</li><li>Funnel</li><li>Journeys</li><li>User Sessions</li><li>When a number looks wrong</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide" data-act="2" data-title="The four, and what they answer">
+  <div class="eyebrow"><span class="dot"></span>Four charts<span class="mins">22 min</span></div>
+  <div class="body">
+    <h2 class="head">The four, and what they answer</h2>
+    <table class="cmp">
+      <colgroup><col style="width:27%"><col style="width:20%"><col style="width:22%"><col style="width:31%"></colgroup>
+      <thead><tr><th>The question</th><th>Chart</th><th>Usual Adobe route</th><th>Where it differs</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="a">How many, broken down by what</td><td class="b">Data Table</td><td>Freeform table</td>
+          <td>Any property is available without being configured first, because there are no slots to allocate.</td>
+        </tr>
+        <tr>
+          <td class="a">Where do people fall out</td><td class="b">Funnel</td><td>Fallout</td>
+          <td>You set the conversion window and the step-order rule explicitly, and both change the answer.</td>
+        </tr>
+        <tr>
+          <td class="a">What did they do next</td><td class="b">Journeys</td><td>Flow</td>
+          <td>Starts from any event, not just a page, so you can begin at a failed address check.</td>
+        </tr>
+        <tr>
+          <td class="a">How often, and for how long</td><td class="b">User Sessions</td><td>Visits metrics</td>
+          <td>A session is a gap between events, set once per project, rather than a hit-based visit.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="caption">Amplitude asks you to pick the question type before you get a canvas. That's a real adjustment coming from a blank freeform table, and it's mostly a help: the chart knows what you're asking, so the controls are the ones you need.</p>
+  </div>
+</section>
+
+<section class="slide" data-act="2" data-title="When a number looks wrong">
+  <div class="eyebrow"><span class="dot"></span>Four charts<span class="mins">22 min</span></div>
+  <div class="body">
+    <h2 class="head">When a number looks wrong today</h2>
+    <ul class="rows">
+      <li><span class="term mono">dicount_applied</span><span class="def">The generator misspells it; the site spells it <code>discount_applied</code>. Two children under one parent, roughly half the data each. Group by either and you've quietly reported on half the cohort.</span></li>
+      <li><span class="term mono">Products.brand</span><span class="def">Over 30 days you'll see Fossil and Michael Kors next to iPhones. The generated line items carry a fashion catalogue that can't be configured. Scope to today and it resolves.</span></li>
+      <li><span class="term mono">[Amplitude] Page Viewed</span><span class="def">Autocapture sends that; the site also sends its own <code>Page Viewed</code> with more properties. Two near-identical names, side by side in the picker.</span></li>
+      <li><span class="term">21 live-only events</span><span class="def">No generated history, so they look broken until someone uses the site. <code>Checkout Step Completed</code> is the one that bites hardest, and you'll hit it in a minute.</span></li>
+    </ul>
+    <p class="caption">First question when a number surprises you: <b>which sources feed this</b>. Second question: which of the four things above is it. That habit transfers straight into a real implementation.</p>
+  </div>
+</section>
+
+<section class="slide ex" data-act="2" data-title="Exercise · Data Table">
+  <div class="eyebrow"><span class="dot"></span>Four charts<span class="mins">22 min</span></div>
+  <div class="body">
+    <div class="station"><span class="snum">02</span><h2>Data Table</h2></div>
+    <ul class="steps">
+      <li>New chart, <strong>Data Table</strong>. Rows: <code>Add to Cart</code>, <code>Checkout Started</code>, <code>Order Placed</code>.</li>
+      <li>Add a second metric so you have <strong>uniques and totals</strong> side by side. Note where they diverge.</li>
+      <li>Break down by <code>Products.department</code>: Mobile, Internet, Accessories.</li>
+      <li>Add a segment for people whose <code>telstra_plus_tier</code> is Gold or VIP.</li>
+    </ul>
+    <div class="donewhen">
+      <b>Done when</b>
+      You can say which department Gold and VIP members add to cart most, and whether they check out more often than everyone else.
+    </div>
+    <p class="ask">What would you normally build in a freeform table that you can't see a way to build here?</p>
+  </div>
+</section>
+
+<section class="slide ex" data-act="2" data-title="Exercise · Funnel">
+  <div class="eyebrow"><span class="dot"></span>Four charts<span class="mins">22 min</span></div>
+  <div class="body">
+    <div class="station"><span class="snum">03</span><h2>Funnel</h2></div>
+    <ul class="steps">
+      <li>New chart, <strong>Funnel</strong>: <code>Product Viewed</code> → <code>Add to Cart</code> → <code>Checkout Started</code> → <code>Order Placed</code>.</li>
+      <li>Change the <strong>conversion window</strong> from 1 day to 30 days and watch the conversion rate move. Same data, different question.</li>
+      <li>Group by <code>Products.department</code>.</li>
+      <li>Now insert <code>Checkout Step Completed</code> as step 4. <span class="aside">Watch what happens to the whole funnel.</span></li>
+    </ul>
+    <div class="donewhen">
+      <b>Done when</b>
+      You can explain why adding a step that obviously happens dropped conversion to nearly zero.
+    </div>
+    <p class="ask">A funnel reports on whoever has every step. Where does that bite while two tools are running side by side?</p>
+  </div>
+</section>
+
+<section class="slide ex" data-act="2" data-title="Exercise · Journeys">
+  <div class="eyebrow"><span class="dot"></span>Four charts<span class="mins">22 min</span></div>
+  <div class="body">
+    <div class="station"><span class="snum">04</span><h2>Journeys</h2></div>
+    <ul class="steps">
+      <li>New chart, <strong>Journeys</strong>. Start from <code>Address Checked</code>.</li>
+      <li>Filter that starting event to the results where serviceability <strong>failed</strong>.</li>
+      <li>Read the branches out. Where do people go when the answer is no?</li>
+    </ul>
+    <div class="donewhen">
+      <b>Done when</b>
+      You can name the two most common next steps after a failed address check.
+    </div>
+    <p class="caption">Starting from an event rather than a page is the part worth noticing. A flow report anchored on URLs can't ask this question at all, because the failure isn't a page, it's a property value on an event.</p>
+  </div>
+</section>
+
+<section class="slide ex" data-act="2" data-title="Exercise · User Sessions">
+  <div class="eyebrow"><span class="dot"></span>Four charts<span class="mins">22 min</span></div>
+  <div class="body">
+    <div class="station"><span class="snum">05</span><h2>User Sessions</h2></div>
+    <ul class="steps">
+      <li>New chart, <strong>User Sessions</strong>. Look at sessions per user and average session length.</li>
+      <li>Add a second series segmented to people who placed an order.</li>
+      <li>Compare the two.</li>
+    </ul>
+    <div class="donewhen">
+      <b>Done when</b>
+      You can say whether purchasers take more sessions than everyone else, and roughly how many.
+    </div>
+    <p class="caption">The session boundary is a project setting, a gap of inactivity, not a rule about hits. So "visits" and "sessions" are close cousins rather than the same measure, and the gap matters as soon as you try to reconcile two tools against each other.</p>
+  </div>
+</section>
+
+<!-- ─────────── ACT 3 · YOUR CHART ─────────── -->
+
+<section class="slide act-slide" data-act="3" data-title="Act 3 divider">
+  <div class="body">
+    <p class="act-num">03</p>
+    <h1>Your chart</h1>
+    <ul class="contains">
+      <li>Your question, not mine</li><li>15 minutes</li><li>"Can't be done" is a result</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide ex" data-act="3" data-title="Exercise · your chart">
+  <div class="eyebrow"><span class="dot"></span>Your chart<span class="mins">15 min</span></div>
+  <div class="body">
+    <div class="station"><span class="snum">06</span><h2>Your chart</h2></div>
+    <ul class="steps">
+      <li><strong>Before you touch Amplitude</strong>, write down one question you answer in Adobe today. One sentence. Two minutes.</li>
+      <li>Build one chart that answers it, using this data and any of the four types.</li>
+      <li>If the data can't answer it, write down <strong>what's missing</strong>: which event, which property, on which step.</li>
+      <li>Keep whichever of the two you end up with. We'll go round the room shortly.</li>
+    </ul>
+    <div class="donewhen">
+      <b>Done when</b>
+      You have a chart you'd be willing to show a stakeholder, or one line describing the gap that stopped you.
+    </div>
+    <p class="caption">The gap is genuinely the more valuable outcome. A list of questions this taxonomy can't answer is the start of the requirements work, and I'd rather collect it from you than invent it.</p>
+  </div>
+</section>
+
+<section class="slide" data-act="3" data-title="If you're stuck">
+  <div class="eyebrow"><span class="dot"></span>Your chart<span class="mins">15 min</span></div>
+  <div class="body">
+    <h2 class="head">Seven that work in this data</h2>
+    <ul class="rows">
+      <li><span class="term mono">Data Table</span><span class="def">Which device brand gets added to cart most? Break <code>Add to Cart</code> down by <code>Products.brand</code>, scoped to today.</span></li>
+      <li><span class="term mono">Data Table</span><span class="def">What share of orders carry trade-in credit? <code>Order Placed</code>, broken down by <code>trade_in_credit</code>.</span></li>
+      <li><span class="term mono">Funnel</span><span class="def">Which checkout step loses the most people? Steps from <code>Checkout Started</code> onwards, live data only.</span></li>
+      <li><span class="term mono">Funnel</span><span class="def">Do Gold and VIP members convert better than Members? Group the purchase funnel by <code>telstra_plus_tier</code>.</span></li>
+      <li><span class="term mono">Funnel</span><span class="def">Does a promo code change the order rate? <code>Promo Code Applied</code> → <code>Order Placed</code>.</span></li>
+      <li><span class="term mono">Journeys</span><span class="def">What do people do after checking usage? Start from <code>Usage Checked</code>.</span></li>
+      <li><span class="term mono">User Sessions</span><span class="def">How many sessions before someone orders? Sessions per user, segmented on having placed an order.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ─────────── ACT 4 · CLOSE ─────────── -->
+
+<section class="slide" data-act="4" data-title="Share-back">
+  <div class="eyebrow"><span class="dot"></span>Close<span class="mins">8 min</span></div>
+  <div class="body">
+    <p class="kicker">Three or four of you, screens shared</p>
+    <h2 class="head">What did you ask, and did it work?</h2>
+    <div class="grid c3">
+      <div class="card signal">
+        <span class="tag">Column 1</span>
+        <h3>Straight across</h3>
+        <p>The question mapped onto a chart type with no argument. These are the reports you'll rebuild in week one.</p>
+      </div>
+      <div class="card action">
+        <span class="tag">Column 2</span>
+        <h3>Needed a property</h3>
+        <p>Answerable in principle, but something isn't being sent. Each of these is a line in the tracking plan.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Column 3</span>
+        <h3>Needed something else</h3>
+        <p>A chart type we haven't covered, or a genuine modelling problem. These set the agenda for sessions 4 and 5.</p>
+      </div>
+    </div>
+    <p class="caption">I'm writing all three columns down. Column 2 and column 3 are the useful output of the hour, and they're the part I can't produce without you in the room.</p>
+  </div>
+</section>
+
+<section class="slide" data-act="4" data-title="Take it away">
+  <div class="eyebrow"><span class="dot"></span>Close<span class="mins">8 min</span></div>
+  <div class="body">
+    <h2 class="head">Take it away</h2>
+    <ul class="rows">
+      <li><span class="term">The sandbox stays up</span><span class="def">Same login, same project. Break it however you like; nothing in it matters.</span></li>
+      <li><span class="term">Build three charts</span><span class="def">From your own backlog, before session 4. Anything you can't build, bring.</span></li>
+      <li><span class="term">Install Event Explorer</span><span class="def">If you didn't get to it today. It's the tool you'll reach for most once you start instrumenting.</span></li>
+      <li><span class="term">The tracking plan</span><span class="def">Every event, every property and every trap in this sandbox is written up. Link's in the invite.</span></li>
+    </ul>
+    <div class="urlbox">
+      <span class="lbl">Sandbox</span>
+      <span class="u">app.amplitude.com/analytics/steep-bush-453227</span>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="4" data-title="Next session">
+  <div class="eyebrow"><span class="dot"></span>Close<span class="mins">8 min</span></div>
+  <div class="body">
+    <p class="kicker">Session 4 of 5</p>
+    <h2 class="head">Identity &amp; the pipeline</h2>
+    <p class="deck">The tag manager, the SDKs, server-side events, and how three IDs resolve into one person. We'll open with the bug you found in the first ten minutes today: one hardcoded customer number, everyone in the room, one profile.</p>
+    <p class="caption" style="margin-top:24px">Questions now, and anything you'd rather do differently next time. The session order still isn't fixed.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ END SLIDES ═══════════════ -->
+
+    <div id="rail" aria-hidden="true"></div>
+    <div id="stamp"></div>
+  </div>
+</div>
+
+<button id="fsbtn" type="button" aria-label="Toggle full screen">
+  <svg class="enter" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+    <path d="M1.5 5.5v-4h4M14.5 5.5v-4h-4M1.5 10.5v4h4M14.5 10.5v4h-4"/>
+  </svg>
+  <svg class="exit" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+    <path d="M5.5 1.5v4h-4M10.5 1.5v4h4M5.5 14.5v-4h-4M10.5 14.5v-4h4"/>
+  </svg>
+  <span class="label">Full screen</span>
+</button>
+
+<div id="timer" aria-live="off">
+  <span class="clock">00:00</span><span class="plan"></span><span class="delta"></span>
+</div>
+
+<div id="jump" role="dialog" aria-label="Jump to slide">
+  <h2>Jump to</h2>
+  <p class="hint">Click a slide · Esc to close</p>
+  <div class="acts"></div>
+</div>
+
+<div id="help" role="dialog" aria-label="Keyboard shortcuts">
+  <div>
+    <h2>Presenter keys</h2>
+    <dl>
+      <dt>→ ↓ Space</dt><dd>Next slide</dd>
+      <dt>← ↑ Backspace</dt><dd>Previous slide</dd>
+      <dt>Home / End</dt><dd>First / last slide</dd>
+      <dt>O</dt><dd>Jump menu</dd>
+      <dt>T / R</dt><dd>Start-stop timer / reset it</dd>
+      <dt>F</dt><dd>Full screen (or the button, top left)</dd>
+      <dt>?</dt><dd>This panel</dd>
+    </dl>
+  </div>
+</div>
+
+<div id="nudge">? for keys · O to jump · T for timer</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ─── RUN OF SHOW ───────────────────────────────────────────────────────────
+  var ACT_NAMES = { "0": "Frame", "1": "The toolkit", "2": "Four charts", "3": "Your chart", "4": "Close" };
+  // Target END minute of each section, for the timer's on-plan / over readout.
+  var ACT_END   = { "0": 5, "1": 15, "2": 37, "3": 52, "4": 60 };
+  var NO_PREFIX = ["0", "1", "2", "3", "4"];
+  // ───────────────────────────────────────────────────────────────────────────
+
+  var stage  = document.getElementById("stage");
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var rail   = document.getElementById("rail");
+  var stamp  = document.getElementById("stamp");
+  var jump   = document.getElementById("jump");
+  var help   = document.getElementById("help");
+  var nudge  = document.getElementById("nudge");
+  var timerEl = document.getElementById("timer");
+  var fsbtn  = document.getElementById("fsbtn");
+  var cur = 0;
+
+  /* ---------- fit the stage to the viewport ---------- */
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    stage.style.transform = "scale(" + s + ")";
+  }
+  window.addEventListener("resize", fit);
+  fit();
+
+  /* ---------- rail ---------- */
+
+  (function buildRail() {
+    var prevAct = null;
+    slides.forEach(function (sl) {
+      if (prevAct !== null && sl.dataset.act !== prevAct) {
+        var gap = document.createElement("span");
+        gap.className = "tick gap";
+        rail.appendChild(gap);
+      }
+      var t = document.createElement("span");
+      t.className = "tick";
+      rail.appendChild(t);
+      prevAct = sl.dataset.act;
+    });
+  })();
+  var ticks = Array.prototype.slice.call(rail.querySelectorAll(".tick:not(.gap)"));
+
+  /* ---------- jump menu ---------- */
+
+  (function buildJump() {
+    var wrap = jump.querySelector(".acts");
+    var groups = {}, order = [];
+    slides.forEach(function (sl, i) {
+      var a = sl.dataset.act;
+      if (!groups[a]) { groups[a] = []; order.push(a); }
+      groups[a].push({ i: i, title: sl.dataset.title || "Slide " + (i + 1) });
+    });
+    order.forEach(function (a) {
+      var g = document.createElement("div");
+      g.className = "act-grp";
+      var h = document.createElement("h3");
+      h.textContent = (NO_PREFIX.indexOf(a) > -1 ? "" : "Act " + a + " · ") + (ACT_NAMES[a] || a);
+      g.appendChild(h);
+      var ol = document.createElement("ol");
+      groups[a].forEach(function (item) {
+        var li = document.createElement("li");
+        var b = document.createElement("button");
+        b.type = "button";
+        b.dataset.i = String(item.i);
+        var n = document.createElement("span");
+        n.className = "n";
+        n.textContent = item.i + 1;
+        b.appendChild(n);
+        b.appendChild(document.createTextNode(item.title));
+        b.addEventListener("click", function () { go(item.i); closePanels(); });
+        li.appendChild(b); ol.appendChild(li);
+      });
+      g.appendChild(ol); wrap.appendChild(g);
+    });
+  })();
+  var jumpButtons = Array.prototype.slice.call(jump.querySelectorAll("button"));
+
+  /* ---------- navigation ---------- */
+
+  function go(n, skipHash) {
+    n = Math.max(0, Math.min(slides.length - 1, n));
+
+    slides[cur].querySelectorAll("video").forEach(function (v) { v.pause(); });
+    slides[cur].classList.remove("on");
+
+    cur = n;
+    slides[cur].classList.add("on");
+
+    slides[cur].querySelectorAll("video").forEach(function (v) {
+      try { v.currentTime = 0; } catch (e) {}
+      var p = v.play(); if (p && p.catch) p.catch(function () {});
+    });
+
+    ticks.forEach(function (t, i) {
+      t.classList.toggle("now", i === cur);
+      t.classList.toggle("seen", i < cur);
+    });
+    var act = slides[cur].dataset.act;
+    stamp.textContent = (ACT_NAMES[act] || "") + "  ·  " + (cur + 1) + " / " + slides.length;
+    jumpButtons.forEach(function (b) { b.classList.toggle("cur", Number(b.dataset.i) === cur); });
+
+    if (!skipHash) { try { history.replaceState(null, "", "#" + (cur + 1)); } catch (e) {} }
+    renderTimer();
+  }
+  function closePanels() { jump.classList.remove("on"); help.classList.remove("on"); }
+
+  /* ---------- timer ---------- */
+
+  var t0 = null, tick = null;
+  function fmt(ms) {
+    var s = Math.max(0, Math.floor(ms / 1000));
+    return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+  }
+  function renderTimer() {
+    if (!t0) return;
+    var elapsed = Date.now() - t0, mins = elapsed / 60000;
+    var act = slides[cur].dataset.act, target = ACT_END[act];
+    timerEl.querySelector(".clock").textContent = fmt(elapsed);
+    timerEl.querySelector(".plan").textContent = target ? (ACT_NAMES[act] || "") + " ends " + target + "m" : "";
+    var d = timerEl.querySelector(".delta");
+    timerEl.classList.remove("ahead", "late");
+    if (target) {
+      var over = mins - target;
+      if (over <= -1) { d.textContent = Math.round(-over) + "m spare"; timerEl.classList.add("ahead"); }
+      else if (over < 3) { d.textContent = "on plan"; }
+      else { d.textContent = "+" + Math.round(over) + "m over"; timerEl.classList.add("late"); }
+    } else { d.textContent = ""; }
+  }
+  function toggleTimer() {
+    if (t0) { t0 = null; clearInterval(tick); timerEl.classList.remove("on"); }
+    else { t0 = Date.now(); timerEl.classList.add("on"); renderTimer(); tick = setInterval(renderTimer, 1000); }
+  }
+
+  /* ---------- full screen ---------- */
+
+  function toggleFullscreen() {
+    var el = document.documentElement;
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else if (el.requestFullscreen) {
+      el.requestFullscreen().catch(function () {});
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    }
+  }
+  function syncFullscreen() {
+    var on = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    document.body.classList.toggle("isfull", on);
+    fsbtn.querySelector(".label").textContent = on ? "Exit" : "Full screen";
+    fit();
+  }
+  // stopPropagation matters: clicking the viewport advances the slide, and
+  // without this the button would toggle full screen AND skip a slide.
+  fsbtn.addEventListener("click", function (e) { e.stopPropagation(); toggleFullscreen(); });
+  // Listen for the change rather than tracking state — the user can leave
+  // full screen with Escape, which never goes through our button.
+  document.addEventListener("fullscreenchange", syncFullscreen);
+  document.addEventListener("webkitfullscreenchange", syncFullscreen);
+
+  /* ---------- keys ---------- */
+
+  document.addEventListener("keydown", function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "Escape") { closePanels(); return; }
+    if (jump.classList.contains("on") || help.classList.contains("on")) {
+      if (e.key === "o" || e.key === "O" || e.key === "?") { closePanels(); e.preventDefault(); }
+      return;
+    }
+    switch (e.key) {
+      case "ArrowRight": case "ArrowDown": case " ": case "PageDown": go(cur + 1); e.preventDefault(); break;
+      case "ArrowLeft": case "ArrowUp": case "Backspace": case "PageUp": go(cur - 1); e.preventDefault(); break;
+      case "Home": go(0); e.preventDefault(); break;
+      case "End": go(slides.length - 1); e.preventDefault(); break;
+      case "o": case "O": jump.classList.add("on"); e.preventDefault(); break;
+      case "?": help.classList.add("on"); e.preventDefault(); break;
+      case "t": case "T": toggleTimer(); break;
+      case "r": case "R": if (t0) { t0 = Date.now(); renderTimer(); } break;
+      case "f": case "F": toggleFullscreen(); break;
+    }
+  });
+
+  /* ---------- click to advance ---------- */
+
+  document.getElementById("viewport").addEventListener("click", function (e) {
+    if (jump.classList.contains("on") || help.classList.contains("on")) return;
+    if (e.clientX < window.innerWidth * 0.12) { go(cur - 1); } else { go(cur + 1); }
+  });
+  help.addEventListener("click", closePanels);
+  jump.addEventListener("click", function (e) { if (e.target === jump) closePanels(); });
+
+  /* ---------- start ---------- */
+
+  function fromHash() {
+    var n = parseInt((location.hash || "").replace("#", ""), 10);
+    return isFinite(n) && n > 0 ? n - 1 : 0;
+  }
+  go(fromHash(), true);
+  window.addEventListener("hashchange", function () {
+    var n = fromHash(); if (n !== cur) go(n, true);
+  });
+  setTimeout(function () { nudge.classList.add("hide"); }, 6000);
+})();
+</script>

@@ -1,0 +1,552 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 3 Handout — Analysis &amp; Debugging</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300..600&display=swap">
+
+<style>
+:root {
+  --ground:  #FFFFFF;
+  --panel:   #F4F6FA;
+  --panel-2: #EAEEF6;
+  --line:    #DCE2EC;
+  --line-hi: #BEC7D6;
+  --text:    #131820;
+  --dim:     #4C5766;
+  --faint:   #7B8695;
+  --accent:  #2C5BD8;
+  --signal:  #0E7C63;
+  --warn:    #A8541A;
+  --warn-bg: #FDF3E9;
+  --sig-bg:  #E8F6F2;
+  --act:     #9A5410;
+  --act-bg:  #FBF1E4;
+
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --disp: "Archivo", var(--sans);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:  #0B0E14;
+    --panel:   #141A25;
+    --panel-2: #1B2331;
+    --line:    #262F3D;
+    --line-hi: #3A4658;
+    --text:    #EDF1F7;
+    --dim:     #A3AEBF;
+    --faint:   #6F7B8C;
+    --accent:  #7FA6FF;
+    --signal:  #3FDCB2;
+    --warn:    #FFB067;
+    --warn-bg: #241A0E;
+    --sig-bg:  #0D2B25;
+    --act:     #FFB067;
+    --act-bg:  #241A0E;
+  }
+}
+:root[data-theme="dark"] {
+  --ground:  #0B0E14;
+  --panel:   #141A25;
+  --panel-2: #1B2331;
+  --line:    #262F3D;
+  --line-hi: #3A4658;
+  --text:    #EDF1F7;
+  --dim:     #A3AEBF;
+  --faint:   #6F7B8C;
+  --accent:  #7FA6FF;
+  --signal:  #3FDCB2;
+  --warn:    #FFB067;
+  --warn-bg: #241A0E;
+  --sig-bg:  #0D2B25;
+  --act:     #FFB067;
+  --act-bg:  #241A0E;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 0 24px 96px;
+  background: var(--ground); color: var(--text);
+  font-family: var(--sans); font-weight: 300;
+  font-size: 16.5px; line-height: 1.6;
+}
+.wrap { max-width: 880px; margin: 0 auto; }
+
+header.top { padding: 52px 0 28px; border-bottom: 2px solid var(--line-hi); }
+header.top h1 {
+  font-family: var(--disp); font-variation-settings: "wdth" 108, "wght" 800;
+  font-size: 40px; line-height: 1.06; letter-spacing: -.028em; margin: 0 0 10px;
+}
+header.top .sub { color: var(--dim); font-size: 18px; margin: 0; max-width: 62ch; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.meta span {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .05em;
+  border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; color: var(--dim);
+}
+
+h2 {
+  font-family: var(--disp); font-variation-settings: "wdth" 104, "wght" 750;
+  font-size: 27px; letter-spacing: -.02em; margin: 52px 0 6px; padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+h2:first-of-type { }
+.subhead {
+  font-family: var(--mono); font-size: 12.5px; color: var(--signal);
+  letter-spacing: .06em; text-transform: uppercase; margin: 0 0 18px;
+}
+h3 {
+  font-family: var(--disp); font-variation-settings: "wdth" 100, "wght" 700;
+  font-size: 18px; margin: 30px 0 8px;
+}
+p { margin: 0 0 14px; max-width: 74ch; }
+strong { font-weight: 600; color: var(--text); }
+
+code {
+  font-family: var(--mono); font-size: .89em;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 4px; padding: 1px 5px; color: var(--accent);
+}
+
+/* ---------- URLs ---------- */
+
+.urls { display: grid; gap: 10px; margin: 24px 0 0; }
+.urlbar {
+  display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;
+  font-family: var(--mono); font-size: 15px; background: var(--panel);
+  border: 1px solid var(--line); border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0; padding: 12px 16px; overflow-wrap: anywhere;
+}
+.urlbar .lbl {
+  font-size: 10.5px; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--accent); min-width: 92px; flex: none;
+}
+.urlbar a { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--line-hi); }
+.urlbar a:hover { border-bottom-color: var(--accent); }
+
+/* ---------- callouts ---------- */
+
+.note, .warn, .point {
+  border: 1px solid var(--line); border-radius: 0 8px 8px 0;
+  padding: 13px 17px; margin: 16px 0; font-size: 15.5px; color: var(--dim);
+}
+.note { background: var(--sig-bg); border-left: 3px solid var(--signal); }
+.warn { background: var(--warn-bg); border-left: 3px solid var(--warn); }
+.point { background: var(--act-bg); border-left: 3px solid var(--act); }
+.note p, .warn p, .point p { margin: 0 0 8px; max-width: none; }
+.note p:last-child, .warn p:last-child, .point p:last-child { margin-bottom: 0; }
+.note .lbl, .warn .lbl, .point .lbl {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .13em;
+  text-transform: uppercase; display: block; margin-bottom: 5px; font-weight: 600;
+}
+.note .lbl { color: var(--signal); }
+.warn .lbl { color: var(--warn); }
+.point .lbl { color: var(--act); }
+
+/* ---------- exercises ---------- */
+
+.ex {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 10px; padding: 20px 24px 22px; margin: 18px 0;
+}
+.ex-head {
+  display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+  padding-bottom: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--line);
+}
+.ex-head .n {
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--act); flex: none;
+}
+.ex-head h3 { margin: 0; font-size: 20px; }
+.ex-head .t {
+  font-family: var(--mono); font-size: 12px; color: var(--faint);
+  margin-left: auto; font-variant-numeric: tabular-nums; flex: none;
+}
+.ex ol { margin: 0 0 14px; padding-left: 22px; }
+.ex ol li { margin-bottom: 8px; color: var(--dim); }
+.ex ol li strong { color: var(--text); }
+
+/* ---------- tables ---------- */
+
+.scroll { overflow-x: auto; margin: 18px 0; border: 1px solid var(--line); border-radius: 8px; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th {
+  text-align: left; font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--faint); font-weight: 400;
+  padding: 10px 14px; background: var(--panel-2); border-bottom: 1px solid var(--line-hi);
+  white-space: nowrap;
+}
+td {
+  padding: 9px 14px; border-bottom: 1px solid var(--line);
+  line-height: 1.42; vertical-align: top; color: var(--dim);
+}
+tbody tr:last-child td { border-bottom: 0; }
+td.a { color: var(--text); font-weight: 500; }
+td.ev { font-family: var(--mono); font-size: 13.5px; color: var(--text); white-space: nowrap; }
+td.pr { font-family: var(--mono); font-size: 12.5px; }
+.grouprow td {
+  background: var(--panel); font-family: var(--mono); font-size: 10.5px;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--signal); padding: 7px 14px;
+}
+.tag {
+  display: inline-block; font-family: var(--mono); font-size: 9.5px;
+  letter-spacing: .07em; text-transform: uppercase; padding: 2px 6px;
+  border: 1px solid currentColor; border-radius: 3px; white-space: nowrap; color: var(--warn);
+}
+.tag.arr { color: var(--accent); }
+
+/* ---------- worksheet ---------- */
+
+.sheet {
+  border: 2px solid var(--line-hi); border-radius: 10px;
+  padding: 22px 24px 24px; margin: 20px 0;
+}
+.sheet h3 { margin-top: 0; }
+.rule { border-bottom: 1px solid var(--line-hi); height: 30px; margin-bottom: 6px; }
+.sheet .fl {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--faint); display: block; margin: 18px 0 8px;
+}
+.sheet .fl:first-of-type { margin-top: 4px; }
+
+ul.plain { margin: 0 0 14px; padding-left: 22px; }
+ul.plain li { margin-bottom: 7px; color: var(--dim); }
+
+footer {
+  margin-top: 56px; padding-top: 20px; border-top: 2px solid var(--line-hi);
+  color: var(--faint); font-size: 14px;
+}
+
+@media print {
+  body { font-size: 10.5pt; padding: 0; background: #fff; }
+  .ex, .sheet, .note, .warn, .point { page-break-inside: avoid; }
+  h2 { page-break-after: avoid; }
+  .urlbar a { border: 0; }
+}
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <h1>Analysis, and how to tell when it's lying</h1>
+  <p class="sub">Session 3 handout. Everything you need for the hour, plus the reference you'll want afterwards when you're building charts on your own.</p>
+  <div class="meta">
+    <span>60 minutes</span><span>6 exercises</span><span>Hands-on</span><span>Sandbox project</span>
+  </div>
+</header>
+
+<div class="urls">
+  <div class="urlbar">
+    <span class="lbl">Sandbox</span>
+    <a href="https://app.amplitude.com/analytics/steep-bush-453227">app.amplitude.com/analytics/steep-bush-453227</a>
+  </div>
+  <div class="urlbar">
+    <span class="lbl">Demo site</span>
+    <a href="https://shermozle.github.io/telstra-demo">shermozle.github.io/telstra-demo</a>
+  </div>
+</div>
+
+<div class="warn">
+  <span class="lbl">Before you start</span>
+  <p>The demo site has a settings panel behind the gear button, bottom right. <strong>Don't put anything in the API key field.</strong> It redirects your events to a project nobody else can see, and you'll spend the session wondering why your charts are empty.</p>
+  <p>Also in that panel: a toggle labelled Guides &amp; Surveys. It's wired to the SDK's opt-out flag, so switching it off stops the site sending <em>anything</em>, replay included, with no error. If your events vanish, check it first.</p>
+</div>
+
+<h2>One project, two sources</h2>
+<p class="subhead">Read this before you build anything</p>
+
+<p>The sandbox receives data from two places at once, and knowing which is which will save you most of the confusion available today.</p>
+
+<div class="scroll">
+  <table>
+    <thead><tr><th>Source</th><th>What it is</th><th>What's in it</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="a">Generated history</td>
+        <td>About a month of backdated behaviour, so charts have something to show.</td>
+        <td>19 of the 40 events. Telco journeys, but a <strong>fashion catalogue</strong> in the cart line items, which can't be configured out.</td>
+      </tr>
+      <tr>
+        <td class="a">The live site</td>
+        <td>Browser SDK, autocapture and Session Replay on. Your clicks land within seconds.</td>
+        <td>All 40 events. Telstra devices, plans and accessories. Today only, because it starts when we start.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>The two sources agree on <strong>names</strong>, not on <strong>contents</strong>. That single sentence explains nearly every odd number you'll meet.</p>
+
+<h2>The exercises</h2>
+<p class="subhead">Self-paced · each one has a "done when" so you know to move on</p>
+
+<div class="ex">
+  <div class="ex-head"><span class="n">Ex 1</span><h3>Make some data</h3><span class="t">3 min</span></div>
+  <ol>
+    <li><strong>Stay logged out.</strong> While you're anonymous your device ID is yours alone, which is what makes you findable in exercise 2.</li>
+    <li>Open a mobile phone on a plan. Pick a colour and a storage size, choose a plan, add it to the cart.</li>
+    <li>In the cart, apply the promo code <code>ONLINE50</code>.</li>
+    <li>Check out. Four steps, any values in the form fields.</li>
+  </ol>
+  <div class="point"><span class="lbl">Done when</span>You've placed an order, and you can name three events you think you just sent.</div>
+</div>
+
+<div class="ex">
+  <div class="ex-head"><span class="n">Ex 2</span><h3>Follow it through the three tools</h3><span class="t">6 min</span></div>
+  <ol>
+    <li><strong>Event Explorer</strong> (Chrome extension) or the site's own log at <code>Ctrl+Shift+D</code>. Find your <code>Order Placed</code> and open the <code>Products</code> property. One object per line item.</li>
+    <li>Check that <code>discount_applied</code> came through as <code>Yes</code>, and work out which of your actions caused that.</li>
+    <li><strong>Ingestion Debugger</strong>, in Amplitude under Data. Find the same event arriving at the server.</li>
+    <li><strong>User Lookup.</strong> Search for user ID <code>2003964661</code>. Then log in on the site, as anyone, and look again.</li>
+  </ol>
+  <div class="point"><span class="lbl">Done when</span>You can explain what the Ingestion Debugger tells you that the extension doesn't, and why the user profile in step 4 contains the whole room.</div>
+</div>
+
+<div class="ex">
+  <div class="ex-head"><span class="n">Ex 3</span><h3>Data Table</h3><span class="t">5 min</span></div>
+  <ol>
+    <li>New chart, Data Table. Rows: <code>Add to Cart</code>, <code>Checkout Started</code>, <code>Order Placed</code>.</li>
+    <li>Add a second metric so you have <strong>uniques and totals</strong> side by side. Look at where they diverge.</li>
+    <li>Break down by <code>Products.department</code>: Mobile, Internet, Accessories.</li>
+    <li>Add a segment for users whose <code>telstra_plus_tier</code> is Gold or VIP.</li>
+  </ol>
+  <div class="point"><span class="lbl">Done when</span>You can say which department Gold and VIP members add to cart most, and whether they check out more often than everyone else.</div>
+</div>
+
+<div class="ex">
+  <div class="ex-head"><span class="n">Ex 4</span><h3>Funnel</h3><span class="t">5 min</span></div>
+  <ol>
+    <li>New chart, Funnel: <code>Product Viewed</code> → <code>Add to Cart</code> → <code>Checkout Started</code> → <code>Order Placed</code>.</li>
+    <li>Change the <strong>conversion window</strong> from 1 day to 30 days. Watch the rate move: same data, different question.</li>
+    <li>Group by <code>Products.department</code>.</li>
+    <li>Insert <code>Checkout Step Completed</code> as step 4, and watch the funnel collapse.</li>
+  </ol>
+  <div class="point"><span class="lbl">Done when</span>You can explain why adding a step that obviously happens dropped conversion to nearly zero.</div>
+</div>
+
+<div class="ex">
+  <div class="ex-head"><span class="n">Ex 5</span><h3>Journeys and User Sessions</h3><span class="t">4 min</span></div>
+  <ol>
+    <li>New chart, Journeys. Start from <code>Address Checked</code>, filtered to the results where serviceability failed. Read the branches out.</li>
+    <li>New chart, User Sessions. Sessions per user and average session length.</li>
+    <li>Add a second series segmented to people who placed an order, and compare.</li>
+  </ol>
+  <div class="point"><span class="lbl">Done when</span>You can name the two most common next steps after a failed address check, and say whether purchasers take more sessions than everyone else.</div>
+</div>
+
+<div class="ex">
+  <div class="ex-head"><span class="n">Ex 6</span><h3>Your chart</h3><span class="t">15 min</span></div>
+  <ol>
+    <li><strong>Before you touch Amplitude</strong>, write your question in the worksheet below. One sentence. Something you actually get asked in Adobe.</li>
+    <li>Build one chart that answers it. Any of the four types, any of this data.</li>
+    <li>If it can't be answered here, write down <strong>what's missing</strong>: which event, which property, on which step.</li>
+  </ol>
+  <div class="point"><span class="lbl">Done when</span>You have a chart you'd show a stakeholder, or one line describing the gap that stopped you. The gap is the more useful of the two.</div>
+</div>
+
+<h2>Your question</h2>
+<p class="subhead">Fill this in before you start exercise 6</p>
+
+<div class="sheet">
+  <h3>The question I get asked in Adobe</h3>
+  <span class="fl">One sentence. Who asks it, and what they do with the answer.</span>
+  <div class="rule"></div>
+  <div class="rule"></div>
+
+  <span class="fl">Which chart type does it want?</span>
+  <div class="rule"></div>
+
+  <span class="fl">Which events and properties does it need?</span>
+  <div class="rule"></div>
+  <div class="rule"></div>
+
+  <span class="fl">If it can't be answered here: what's missing, and on which event?</span>
+  <div class="rule"></div>
+  <div class="rule"></div>
+</div>
+
+<h2>The four chart types</h2>
+<p class="subhead">And the Adobe route you'd normally take for the same question</p>
+
+<div class="scroll">
+  <table>
+    <thead><tr><th>The question</th><th>Chart</th><th>Usual Adobe route</th><th>Where it differs</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="a">How many, broken down by what</td><td class="ev">Data Table</td><td>Freeform table</td>
+        <td>Any property is available without being configured first, because there are no slots to allocate.</td>
+      </tr>
+      <tr>
+        <td class="a">Where do people fall out</td><td class="ev">Funnel</td><td>Fallout</td>
+        <td>You set the conversion window and the step-order rule explicitly, and both change the answer.</td>
+      </tr>
+      <tr>
+        <td class="a">What did they do next</td><td class="ev">Journeys</td><td>Flow</td>
+        <td>Starts from any event, not just a page, so a path can begin at a failed address check.</td>
+      </tr>
+      <tr>
+        <td class="a">How often, for how long</td><td class="ev">User Sessions</td><td>Visits metrics</td>
+        <td>A session is a gap of inactivity, set once per project, rather than a hit-based visit.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>Amplitude asks you to pick the question type before it gives you a canvas. Coming from a blank freeform table that feels like a constraint, and mostly it isn't: the chart knows what you're asking, so the controls in front of you are the ones that question needs.</p>
+
+<h2>When a number looks wrong</h2>
+<p class="subhead">Four things in this data that will make you think something's broken</p>
+
+<div class="scroll">
+  <table>
+    <thead><tr><th>What you'll see</th><th>What's actually happening</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="a"><code>dicount_applied</code> and <code>discount_applied</code>, both real</td>
+        <td>The generator misspells it, missing an S. The site spells it correctly. Two children under one parent, each populated for roughly half the data. Group by either and you've quietly reported on half the cohort. Nothing errors.</td>
+      </tr>
+      <tr>
+        <td class="a">Fossil and Michael Kors next to iPhones</td>
+        <td>The generated line items carry a hardcoded fashion catalogue. Scope the chart to today and it resolves to Telstra devices. Two sources agreeing on a schema and disagreeing on contents.</td>
+      </tr>
+      <tr>
+        <td class="a"><code>Page Viewed</code> and <code>[Amplitude] Page Viewed</code></td>
+        <td>Autocapture sends one, the site sends its own with more properties. Neither is wrong. Someone in a hurry picks the wrong one and the numbers are close enough that nobody notices.</td>
+      </tr>
+      <tr>
+        <td class="a">An event with no data at all</td>
+        <td>21 of the 40 events are live only, so they look empty until someone uses the site. A <strong>funnel</strong> containing one of them silently narrows to the handful of people who have every step.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="note">
+  <span class="lbl">The habit</span>
+  <p>When a number surprises you, the first question is <strong>which sources feed this chart</strong>, not which chart is broken. Everything above is an instance of that question having an interesting answer.</p>
+</div>
+
+<h2>Event cheat sheet</h2>
+<p class="subhead">The ones you'll want today · <span class="tag">live only</span> means no generated history</p>
+
+<div class="scroll">
+  <table>
+    <thead><tr><th>Event</th><th>Properties worth knowing</th><th></th></tr></thead>
+    <tbody>
+      <tr class="grouprow"><td colspan="3">Browse</td></tr>
+      <tr><td class="ev">Product Viewed</td><td class="pr">product_id, product_name, product_brand, product_category, product_price</td><td></td></tr>
+      <tr><td class="ev">Product List Viewed</td><td class="pr">category, filter_brand, sort_by, results_count</td><td></td></tr>
+      <tr><td class="ev">Search Submitted</td><td class="pr">search_term, results_count</td><td><span class="tag">live only</span></td></tr>
+
+      <tr class="grouprow"><td colspan="3">Configure</td></tr>
+      <tr><td class="ev">Plan Selected</td><td class="pr">plan_name, plan_type, plan_price, data_allowance, context</td><td></td></tr>
+      <tr><td class="ev">Add-On Toggled</td><td class="pr">addon_name, addon_price, action</td><td></td></tr>
+      <tr><td class="ev">Product Colour Selected</td><td class="pr">product_name, colour</td><td><span class="tag">live only</span></td></tr>
+      <tr><td class="ev">Product Storage Selected</td><td class="pr">product_name, storage, price_change</td><td><span class="tag">live only</span></td></tr>
+      <tr><td class="ev">Trade-In Started</td><td class="pr">device_type</td><td></td></tr>
+
+      <tr class="grouprow"><td colspan="3">Cart and checkout</td></tr>
+      <tr><td class="ev">Add to Cart</td><td class="pr">Products, product_name, product_category, plan_name, monthly_total, cart_value</td><td><span class="tag arr">array</span></td></tr>
+      <tr><td class="ev">Cart Viewed</td><td class="pr">cart_items_count, cart_monthly_value, cart_upfront_value</td><td></td></tr>
+      <tr><td class="ev">Remove from Cart</td><td class="pr">product_name, reason</td><td></td></tr>
+      <tr><td class="ev">Promo Code Applied</td><td class="pr">promo_code, result, discount_amount</td><td></td></tr>
+      <tr><td class="ev">Checkout Started</td><td class="pr">Products, cart_items_count, cart_value</td><td><span class="tag arr">array</span></td></tr>
+      <tr><td class="ev">Checkout Step Completed</td><td class="pr">Products, step_name, step_number</td><td><span class="tag">live only</span> <span class="tag arr">array</span></td></tr>
+      <tr><td class="ev">Order Placed</td><td class="pr">Products, order_id, items_count, total_monthly, total_upfront, promo_code, points_used, trade_in_credit</td><td><span class="tag arr">array</span></td></tr>
+
+      <tr class="grouprow"><td colspan="3">Account and service</td></tr>
+      <tr><td class="ev">Login Completed</td><td class="pr">method</td><td></td></tr>
+      <tr><td class="ev">Address Checked</td><td class="pr">technology_type, result, suburb, state</td><td></td></tr>
+      <tr><td class="ev">Usage Checked</td><td class="pr">service_type, data_used_pct, days_remaining</td><td></td></tr>
+      <tr><td class="ev">Bill Viewed</td><td class="pr">bill_period, bill_amount</td><td></td></tr>
+      <tr><td class="ev">Dashboard Viewed</td><td class="pr">telstra_plus_tier, points_balance, services_count</td><td><span class="tag">live only</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p>All 40 events, with the design reasoning behind each one, are in the tracking plan document linked from the invite. The list above is just what the exercises need.</p>
+
+<h3>The Products array</h3>
+<p>Four events carry a <code>Products</code> object array, one object per line item, which Amplitude splits into child properties after ingestion. Those children are what appear in a group-by, and they're what let you group by something <em>inside</em> the cart rather than something about the cart as a whole.</p>
+
+<div class="scroll">
+  <table>
+    <thead><tr><th>Child property</th><th>Values</th></tr></thead>
+    <tbody>
+      <tr><td class="ev">Products.brand</td><td class="pr">Apple, Samsung, Google, Nokia, Telstra — plus the fashion brands from the generated history</td></tr>
+      <tr><td class="ev">Products.department</td><td class="pr">Mobile, Internet, Accessories</td></tr>
+      <tr><td class="ev">Products.categories</td><td class="pr">Smartphone, nbn, 5G Home, SIM Only, Audio, Charging, Home, Protection</td></tr>
+      <tr><td class="ev">Products.discount_applied</td><td class="pr">Yes, No — and note <code>Products.dicount_applied</code> sitting next to it</td></tr>
+      <tr><td class="ev">Products.item_id</td><td class="pr">integer · 101–112 devices, 201–206 accessories, 301–310 internet, 401–403 plan tiers</td></tr>
+      <tr><td class="ev">Products.price</td><td class="pr">number · monthly charge on plans, one-off charge on accessories. Product mix questions, not revenue questions.</td></tr>
+      <tr><td class="ev">Products.quantity</td><td class="pr">always 1 · the site has no quantity stepper</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="note">
+  <span class="lbl">Why price and revenue are kept apart</span>
+  <p>A Telstra cart mixes recurring and one-off charges: an iPhone on a plan at $120 a month next to a $399 pair of AirPods. Summing one <code>price</code> field across those is meaningless in either direction, so <code>Order Placed</code> carries <code>total_monthly</code> and <code>total_upfront</code> as separate properties. Every subscription business hits this, and most first attempts pick one field and lose the distinction.</p>
+</div>
+
+<h3>User properties</h3>
+<p>Set on login, and useful for segmenting every chart you build today.</p>
+<div class="scroll">
+  <table>
+    <thead><tr><th>Property</th><th>Values</th></tr></thead>
+    <tbody>
+      <tr><td class="ev">telstra_plus_tier</td><td class="pr">Member, Silver, Gold, VIP</td></tr>
+      <tr><td class="ev">account_type</td><td class="pr">postpaid, prepaid, business</td></tr>
+      <tr><td class="ev">plan_name</td><td class="pr">Basic, Essential, Premium</td></tr>
+      <tr><td class="ev">active_device</td><td class="pr">iPhone 17 Pro, Galaxy S26, Pixel 10</td></tr>
+      <tr><td class="ev">services_count</td><td class="pr">1, 2, 3, 4</td></tr>
+      <tr><td class="ev">monthly_spend</td><td class="pr">45, 68, 95, 140, 210</td></tr>
+      <tr><td class="ev">telstra_plus_points</td><td class="pr">0, 2500, 5000, 12000, 30000</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Seven questions that work in this data</h2>
+<p class="subhead">If your own question isn't coming, take one of these</p>
+
+<div class="scroll">
+  <table>
+    <thead><tr><th>Chart</th><th>Question, and how to build it</th></tr></thead>
+    <tbody>
+      <tr><td class="ev">Data Table</td><td>Which device brand gets added to cart most? Break <code>Add to Cart</code> down by <code>Products.brand</code>, scoped to today.</td></tr>
+      <tr><td class="ev">Data Table</td><td>What share of orders carry trade-in credit? <code>Order Placed</code>, broken down by <code>trade_in_credit</code>.</td></tr>
+      <tr><td class="ev">Funnel</td><td>Which checkout step loses the most people? Steps from <code>Checkout Started</code> onwards, live data only.</td></tr>
+      <tr><td class="ev">Funnel</td><td>Do Gold and VIP members convert better than Members? Group the purchase funnel by <code>telstra_plus_tier</code>.</td></tr>
+      <tr><td class="ev">Funnel</td><td>Does a promo code change the order rate? <code>Promo Code Applied</code> → <code>Order Placed</code>.</td></tr>
+      <tr><td class="ev">Journeys</td><td>What do people do after checking their usage? Start from <code>Usage Checked</code>.</td></tr>
+      <tr><td class="ev">User Sessions</td><td>How many sessions before someone orders? Sessions per user, segmented on having placed an order.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Magic strings</h2>
+<p class="subhead">The handful of literals you'll need</p>
+
+<ul class="plain">
+  <li><code>ONLINE50</code> and <code>PROMO20</code> are the two working promo codes. Anything else returns an invalid result, which is itself a usable event to analyse.</li>
+  <li><code>2003964661</code> is the customer ID that every logged-in visitor becomes, because the site hardcodes it. One profile, all of us.</li>
+  <li><code>Ctrl+Shift+D</code> opens the site's demo panel. <code>Ctrl+Shift+R</code> resets its demo data.</li>
+  <li>Login accepts any email and any password.</li>
+</ul>
+
+<h2>After today</h2>
+<p class="subhead">Three things, before session 4</p>
+
+<ul class="plain">
+  <li><strong>The sandbox stays up.</strong> Same login, same project. Break it however you like, nothing in it matters.</li>
+  <li><strong>Build three charts from your own backlog</strong>, the things people actually ask you for. Anything you can't build, bring it.</li>
+  <li><strong>Install the Event Explorer extension</strong> if you didn't get to it. It's the tool you'll reach for most once you start instrumenting.</li>
+</ul>
+
+<p>Session 4 is identity and the pipeline: the tag manager, the SDKs, server-side events, and how three IDs resolve into one person. It opens with the bug from exercise 2.</p>
+
+<footer>
+  Telstra × Amplitude enablement · Session 3 of 5 · Analysis and debugging
+</footer>
+
+</div>
