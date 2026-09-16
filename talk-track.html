@@ -203,7 +203,7 @@ a { color: var(--accent); }
 
 <header class="top">
   <h1>Session 3 — talk track</h1>
-  <p class="sub">Telstra implementers · analysis and debugging · 60 minutes, hands-on</p>
+  <p class="sub">Telstra implementers · getting started with analytics · 60 minutes, hands-on</p>
   <div class="meta">
     <span>22 slides</span><span>60 min</span><span>Sandbox: steep-bush-453227</span><span>Site: telstra-demo</span><span>Presenter: Simon</span>
   </div>
@@ -212,7 +212,7 @@ a { color: var(--accent); }
 <div class="note" style="margin-top:26px">
   <span class="lbl">How to use this</span>
   <p>A floor, not a script. The prose is here so you don't lose the thread while eight people are asking why their chart is empty. Use your own words.</p>
-  <p>The hour is over-subscribed on purpose, because the room will talk. Blocks 15 and 16 are marked <strong>cut first</strong> and block 12 <strong>cut second</strong>. Shed those rather than eating into block 18, which is the one thing here that only works with these people in the room.</p>
+  <p>The hour is over-subscribed on purpose, because the room will talk. Blocks 15 and 16 are marked <strong>cut first</strong> and block 12 <strong>cut second</strong>. Shed those rather than eating into block 18, which needs the room and can't be made up afterwards.</p>
 </div>
 
 <h3 style="font-family:var(--disp);font-variation-settings:'wdth' 104,'wght' 750;font-size:20px;margin:36px 0 0">Run of show</h3>
@@ -237,7 +237,7 @@ a { color: var(--accent); }
   <div class="bhead"><span class="sn">1</span><span class="clock">0:00</span><span class="btitle">Cover</span></div>
   <div class="say">
     <p>Right, laptops open. Today you do the work and I get out of the way, mostly.</p>
-    <p>Two halves. First I'll show you the tools you use when you don't trust a number, because you're going to need them within about ten minutes. Then four chart types. Then the last twenty minutes are yours: you each pick a question you currently answer in Adobe, and you build it.</p>
+    <p>Three parts. First the tools you use when you don't trust a number, because you're going to need them within about ten minutes. Then four chart types. Then the last stretch is yours: you each pick a question you currently answer in Adobe, and you build it.</p>
   </div>
   <div class="do">
     <span class="lbl">Do</span>
@@ -249,7 +249,7 @@ a { color: var(--accent); }
   <div class="bhead"><span class="sn">2</span><span class="clock">1:00</span><span class="btitle">Where we are</span></div>
   <div class="say">
     <p>Session one was the model, session two was events and properties. Today is analysis, which is where those two start paying for themselves.</p>
-    <p>Fair warning about the title: a decent chunk of today is about how charts mislead you. Reading one sceptically is the skill I'm trying to teach, and the data in this sandbox has several real problems in it, deliberately, so you'll get the practice.</p>
+    <p>One thing to flag: a decent chunk of today is about how charts mislead you. The data in this sandbox has several real problems in it, deliberately, so you'll get some practice at spotting them.</p>
   </div>
 </div>
 
@@ -273,7 +273,7 @@ a { color: var(--accent); }
     <p>Before anything else, this. One project, two sources of data.</p>
     <p>There's about a month of generated history, so that charts have something in them before any of us touches anything. And there's the live site, which is running the browser SDK with autocapture and Session Replay on. Anything you click in the next hour lands in the same project within a few seconds.</p>
     <p>The important bit: the two sources use the same event and property <em>names</em>, but not the same <em>contents</em>. Nineteen events have history behind them. The other twenty-one are live only, so they'll look completely empty until someone uses the site.</p>
-    <p>Almost every strange number you meet today comes back to that. If you leave with one habit, let it be asking which sources feed a chart before you assume the chart is broken.</p>
+    <p>Almost every strange number you meet today comes back to that. So before you assume a chart is broken, ask which sources feed it.</p>
   </div>
   <div class="note">
     <span class="lbl">Worth saying out loud</span>
@@ -297,7 +297,7 @@ a { color: var(--accent); }
   <div class="bhead"><span class="sn">6</span><span class="clock">5:15</span><span class="btitle">Exercise · make some data</span></div>
   <div class="say">
     <p>Three minutes. Buy a phone.</p>
-    <p>One instruction that matters: <strong>stay logged out</strong>. While you're anonymous your device ID is yours alone, which makes you findable in a minute. I'll explain why that's worth caring about shortly.</p>
+    <p>One instruction that matters: <strong>stay logged out</strong>. While you're anonymous your device ID is yours alone, which makes you findable in a minute. I'll come back to why that matters.</p>
     <p>Pick a mobile on a plan, choose a colour and a storage size, pick a plan, add it to the cart. In the cart, apply the promo code <code>ONLINE50</code>. Then check out: four steps, put whatever you like in the form fields.</p>
   </div>
   <div class="do">
@@ -328,7 +328,7 @@ a { color: var(--accent); }
   <div class="bhead"><span class="sn">8</span><span class="clock">11:00</span><span class="btitle">What Amplitude accepted</span></div>
   <div class="say">
     <p>Tool two, and this one's inside Amplitude, under Data. The Ingestion Debugger is a live view of events arriving at the server, with the payload as received.</p>
-    <p>Why that's a separate tool from the last one: the extension tells you what left the browser. This tells you what Amplitude kept. Those are different questions, and the gap between them is where a specific and very annoying class of bug lives. Instrumentation that looks perfect in the browser and produces nothing in a chart is almost always a filter, a block, or a type mismatch, and this is the only place it shows.</p>
+    <p>Why that's a separate tool from the last one: the extension tells you what left the browser. This tells you what Amplitude kept. Those are different questions, and the gap between them is where a whole class of bug hides. Instrumentation that looks perfect in the browser and produces nothing in a chart is almost always a filter, a block, or a type mismatch, and this is the only place it shows.</p>
   </div>
   <div class="do">
     <span class="lbl">Do</span>
@@ -339,10 +339,10 @@ a { color: var(--accent); }
 <div class="slide-block">
   <div class="bhead"><span class="sn">9</span><span class="clock">12:30</span><span class="btitle">One user's actual events</span></div>
   <div class="say">
-    <p>Tool three, and it's the one you'll use most often for the rest of your career here. User Lookup gives you one person's events in order, with every property, and every user-property change marked at the point it happened.</p>
+    <p>Tool three, and it's the one you'll use most often. User Lookup gives you one person's events in order, with every property, and every user-property change marked at the point it happened.</p>
     <p>It's what you open when someone says the report is wrong. You stop arguing about the aggregate and go and look at one person's actual events.</p>
     <p>Now do this. Search for user ID <code>2003964661</code>. Then log in on the site, as anybody, any email, and look again.</p>
-    <p>Everyone who logs in becomes that ID, because the site hardcodes one customer number. Eight people's sessions, one user profile, no error, no warning, and a chart of "purchases per user" that is quietly nonsense. That's not a contrived example. It's the shape of a real bug, and it's the opening case in session four.</p>
+    <p>Everyone who logs in becomes that ID, because the site hardcodes one customer number. Eight people's sessions, one user profile, no error, no warning, and a chart of "purchases per user" that is quietly nonsense. That's the shape of a real bug, and it's the opening case in session four.</p>
   </div>
   <div class="note">
     <span class="lbl">Don't oversell it</span>
@@ -350,7 +350,7 @@ a { color: var(--accent); }
   </div>
   <div class="cut">
     <span class="lbl">Optional, 60 seconds</span>
-    <p>If you're ahead of the clock, find your own session in Session Replay from the user profile and play ten seconds of it. Watching your own checkout back is the thing people remember from the session. Confirm before the day that replay is actually ingesting in this project.</p>
+    <p>If you're ahead of the clock, find your own session in Session Replay from the user profile and play ten seconds of it. People tend to remember watching their own checkout back. Confirm before the day that replay is actually ingesting in this project.</p>
   </div>
 </div>
 
@@ -374,7 +374,7 @@ a { color: var(--accent); }
   <div class="bhead"><span class="sn">11</span><span class="clock">15:15</span><span class="btitle">The four, and what they answer</span></div>
   <div class="say">
     <p>Four questions, four chart types. How many broken down by what; where people fall out; what they did next; how often and for how long.</p>
-    <p>The third column is the route you'd take in Adobe for the same question, roughly. The fourth is where it actually differs, and those differences are worth knowing before you promise anyone parity.</p>
+    <p>The third column is the route you'd take in Adobe for the same question, roughly. The fourth is where it actually differs, and you want to know those before you promise anyone parity.</p>
     <p>One adjustment I'd flag now. Amplitude asks you to choose the question type before it gives you a canvas, which after years of starting from a blank freeform table feels like a constraint. Mostly it isn't: because the chart knows what you're asking, the controls in front of you are the ones that question needs. But it does mean the first move is deciding what kind of question you have.</p>
   </div>
   <div class="note">
@@ -437,11 +437,11 @@ a { color: var(--accent); }
   <div class="say">
     <p>Journeys, quickly. New chart, Journeys, start from address checked, then filter it to the cases where serviceability failed.</p>
     <p>Read the branches. Where do people go when the answer is no? Support, another address, or away.</p>
-    <p>The thing worth noticing is the starting point. A flow report anchored on page URLs can't ask this question, because "the address failed" isn't a page, it's a property value on an event. Starting a path from an event with a filter on it is the difference.</p>
+    <p>The starting point is what makes it work. A flow report anchored on page URLs can't ask this question, because "the address failed" isn't a page, it's a property value on an event.</p>
   </div>
   <div class="cut">
     <span class="lbl">Cut first</span>
-    <p>If you're past 32 minutes, stop running this as an exercise and just build it on the screen in ninety seconds while they watch. The lesson survives being demonstrated; block 18 does not survive being shortened.</p>
+    <p>If you're past 32 minutes, stop running this as an exercise and just build it on the screen in ninety seconds while they watch. Demonstrating it teaches nearly as well, and shortening block 18 doesn't work at all.</p>
   </div>
 </div>
 
@@ -489,7 +489,7 @@ a { color: var(--accent); }
   </div>
   <div class="note">
     <span class="lbl">If the room stalls</span>
-    <p>If two or three people can't think of a question, don't let it drag. Put up slide 19 and tell them to take one from the list. A stalled exercise empties the room's energy faster than anything else in the hour.</p>
+    <p>If two or three people can't think of a question, don't let it drag. Put up slide 19 and tell them to take one from the list. A stalled exercise is hard to recover from.</p>
   </div>
 </div>
 
@@ -518,7 +518,7 @@ a { color: var(--accent); }
   </div>
   <div class="do">
     <span class="lbl">Do</span>
-    <p>Pick the people rather than asking for volunteers, and pick at least one person whose question <em>didn't</em> work. A share-back of four successes teaches the room less than one honest dead end.</p>
+    <p>Pick the people rather than asking for volunteers, and pick at least one person whose question <em>didn't</em> work. The dead ends are more instructive, and hearing one makes it safe for others to admit theirs.</p>
     <p>Three at 30 seconds each plus discussion is about five minutes. If you're at 55 already, take two.</p>
   </div>
 </div>
@@ -597,7 +597,7 @@ a { color: var(--accent); }
   <li>Check what values the address check actually sends for its result property, so the block 15 filter matches.</li>
   <li>Confirm Session Replay is ingesting in this project, not merely being sent by the site, before promising the optional replay moment in block 9.</li>
   <li>Check the Guides &amp; Surveys toggle is on in your own demo panel, and know where it is so you can check someone else's.</li>
-  <li>Have slide 19 reachable in one keystroke. You will need it.</li>
+  <li>Have slide 19 reachable in one keystroke.</li>
   <li>Decide now whether you're cutting blocks 15 and 16, based on how much block 12 ran over last time you taught something like it.</li>
 </ul>
 
